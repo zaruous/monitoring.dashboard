@@ -12,34 +12,57 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 public class ScheduleMonitoringControl extends CardControl {
-    private final DatePicker scheduleDatePicker;
-    private final TableView<ScheduleEntry> scheduleTableView;
-    private final DatabaseManager dbManager;
+	private DatePicker scheduleDatePicker;
+	private TableView<ScheduleEntry> scheduleTableView;
+	private DatabaseManager dbManager;
 
-    public ScheduleMonitoringControl() {
-        super("스케줄 모니터링");
-        dbManager = new DatabaseManager();
+	public ScheduleMonitoringControl() {
+		super("스케줄 모니터링");
+		dbManager = new DatabaseManager();
 
-        scheduleDatePicker = new DatePicker(LocalDate.now());
-        scheduleDatePicker.setOnAction(event -> reloadData());
+		scheduleDatePicker = new DatePicker(LocalDate.now());
+		scheduleDatePicker.setOnAction(event -> reloadData());
 
-        HBox datePickerBox = new HBox(new Label("날짜 선택: "), scheduleDatePicker);
-        datePickerBox.setSpacing(5);
-        datePickerBox.setAlignment(Pos.CENTER_LEFT);
+		HBox datePickerBox = new HBox(new Label("날짜 선택: "), scheduleDatePicker);
+		datePickerBox.setSpacing(5);
+		datePickerBox.setAlignment(Pos.CENTER_LEFT);
 
-        scheduleTableView = new TableView<>();
-        // ... 컬럼 설정 (기존과 동일) ...
+		scheduleTableView = new TableView<>();
+		// 컬럼 설정 (기존과 동일)
+		TableColumn<ScheduleEntry, String> idCol = new TableColumn<>("스케줄 ID");
+		idCol.setCellValueFactory(new PropertyValueFactory<>("scheduleId"));
+		TableColumn<ScheduleEntry, String> nameCol = new TableColumn<>("인터페이스 명");
+		nameCol.setCellValueFactory(new PropertyValueFactory<>("interfaceName"));
+		TableColumn<ScheduleEntry, String> statusCol = new TableColumn<>("상태");
+		statusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+		statusCol.setCellFactory(column -> new TableCell<>() {
+			@Override
+			protected void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				if (item == null || empty) {
+					setText(null); setStyle("");
+				} else {
+					setText(item);
+					if (item.equals("성공")) setTextFill(Color.GREEN);
+					else if (item.equals("실패")) setTextFill(Color.RED);
+					else setTextFill(Color.BLACK);
+				}
+			}
+		});
+		TableColumn<ScheduleEntry, String> timeCol = new TableColumn<>("실행 시간 (소요 시간)");
+		timeCol.setCellValueFactory(new PropertyValueFactory<>("executionTimeDisplay"));
 
-        VBox.setVgrow(scheduleTableView, Priority.ALWAYS);
+		scheduleTableView.getColumns().addAll(idCol, nameCol, statusCol, timeCol);
+		VBox.setVgrow(scheduleTableView, Priority.ALWAYS);
 
         reloadData(); // 초기 데이터 로드
 
         this.getChildren().addAll(datePickerBox, scheduleTableView);
         VBox.setVgrow(this, Priority.ALWAYS);
         HBox.setHgrow(this, Priority.ALWAYS);
-    }
+	}
 
-    public void reloadData() {
+	public void reloadData() {
         LocalDate selectedDate = scheduleDatePicker.getValue();
         if (selectedDate == null) return;
 
