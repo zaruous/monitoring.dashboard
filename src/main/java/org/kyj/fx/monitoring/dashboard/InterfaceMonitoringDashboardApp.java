@@ -15,11 +15,14 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
-// 메인 애플리케이션 클래스
 public class InterfaceMonitoringDashboardApp extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+        // 데이터베이스 초기화
+        DatabaseManager dbManager = new DatabaseManager();
+        dbManager.initializeDatabase();
+        
 		primaryStage.setTitle("인터페이스 모니터링 보드 (JavaFX)");
 
 		// 전체 레이아웃을 위한 GridPane
@@ -27,23 +30,23 @@ public class InterfaceMonitoringDashboardApp extends Application {
 		gridPane.setHgap(20); // 가로 간격
 		gridPane.setVgap(20); // 세로 간격
 		gridPane.setPadding(new Insets(20));
-		gridPane.setStyle("-fx-background-color: #f3f4f6;"); // HTML의 body 배경색과 유사하게
+		gridPane.setStyle("-fx-background-color: #f3f4f6;");
 
 		// 1. 전체 인터페이스 현황 컨트롤
 		OverallStatusControl overallStatusControl = new OverallStatusControl();
-		GridPane.setConstraints(overallStatusControl, 0, 0); // 0열 0행
+		GridPane.setConstraints(overallStatusControl, 0, 0);
 
 		// 2. 스케줄 모니터링 컨트롤
 		ScheduleMonitoringControl scheduleMonitoringControl = new ScheduleMonitoringControl();
-		GridPane.setConstraints(scheduleMonitoringControl, 1, 0); // 1열 0행
+		GridPane.setConstraints(scheduleMonitoringControl, 1, 0);
 
 		// 3. 데이터 변동률 컨트롤
 		DataFluctuationControl dataFluctuationControl = new DataFluctuationControl();
-		GridPane.setConstraints(dataFluctuationControl, 0, 1); // 0열 1행
+		GridPane.setConstraints(dataFluctuationControl, 0, 1);
 
 		// 4. 개발 아이템 정보 컨트롤
 		DevelopmentItemControl developmentItemControl = new DevelopmentItemControl();
-		GridPane.setConstraints(developmentItemControl, 1, 1); // 1열 1행
+		GridPane.setConstraints(developmentItemControl, 1, 1);
 
 		gridPane.getChildren().addAll(overallStatusControl, scheduleMonitoringControl, dataFluctuationControl,
 				developmentItemControl);
@@ -74,7 +77,7 @@ public class InterfaceMonitoringDashboardApp extends Application {
 		rootLayout.setCenter(gridPane);
 		rootLayout.setStyle("-fx-background-color: #f3f4f6;");
 
-		Scene scene = new Scene(rootLayout, 1200, 850); // 창 크기 조절
+		Scene scene = new Scene(rootLayout, 1200, 850);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

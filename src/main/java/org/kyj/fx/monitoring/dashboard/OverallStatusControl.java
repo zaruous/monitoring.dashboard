@@ -1,16 +1,12 @@
-/**
- * 
- */
 package org.kyj.fx.monitoring.dashboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -23,32 +19,36 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 
-/**
- * 
- */
 public class OverallStatusControl extends CardControl {
 	private PieChart pieChart;
 	private Label totalCountsLabel;
 	private List<InterfaceStatusDetail> successDetails;
 	private List<InterfaceStatusDetail> failDetails;
+    private List<InterfaceStatusDetail> inProgressDetails; // 진행중 리스트 추가
+
+	private DatabaseManager dbManager;
+	private OverallStatusController controller;
 
 	public OverallStatusControl() {
 		super("전체 인터페이스 현황");
-
-		// 더미 데이터 초기화
-		initializeDummyData();
+		dbManager = new DatabaseManager();
+		controller = new OverallStatusController();
+		
+		// 데이터베이스에서 데이터 로드
+		loadDataFromDB();
 
 		pieChart = new PieChart();
 		PieChart.Data successSlice = new PieChart.Data("성공", successDetails.size());
 		PieChart.Data failSlice = new PieChart.Data("실패", failDetails.size());
-		pieChart.getData().addAll(successSlice, failSlice);
+        PieChart.Data inProgressSlice = new PieChart.Data("진행중", inProgressDetails.size()); // 진행중 슬라이스 추가
+
+		pieChart.getData().addAll(successSlice, failSlice, inProgressSlice);
 		pieChart.setLegendVisible(true);
-		// pieChart.setLabelsVisible(false); // 파이 조각에 직접 레이블 표시 안함
 
 		// 파이 차트 조각 색상 설정
-		// CSS로 하는 것이 더 유연하지만, 코드로 간단히 설정
-		successSlice.getNode().setStyle("-fx-pie-color: #4CAF50;"); // 녹색 계열
-		failSlice.getNode().setStyle("-fx-pie-color: #F44336;"); // 빨간색 계열
+		successSlice.getNode().setStyle("-fx-pie-color: #4CAF50;"); // 녹색
+		failSlice.getNode().setStyle("-fx-pie-color: #F44336;");   // 빨간색
+        inProgressSlice.getNode().setStyle("-fx-pie-color: #FFC107;"); // 노란색
 
 		// 파이 차트 클릭 이벤트
 		for (final PieChart.Data data : pieChart.getData()) {
@@ -56,19 +56,30 @@ public class OverallStatusControl extends CardControl {
 				String statusType = data.getName();
 				List<InterfaceStatusDetail> detailsToShow;
 				String modalTitle;
-				if (statusType.equals("성공")) {
-					detailsToShow = successDetails;
-					modalTitle = "성공 인터페이스 상세 정보";
-				} else {
-					detailsToShow = failDetails;
-					modalTitle = "실패 인터페이스 상세 정보";
+				boolean isFail = false;
+
+				switch (statusType) {
+					case "성공":
+						detailsToShow = successDetails;
+						modalTitle = "성공 인터페이스 상세 정보";
+						break;
+					case "실패":
+						detailsToShow = failDetails;
+						modalTitle = "실패 인터페이스 상세 정보";
+						isFail = true;
+						break;
+                    case "진행중":
+                        detailsToShow = inProgressDetails;
+                        modalTitle = "진행중 인터페이스 상세 정보";
+                        break;
+					default:
+						return;
 				}
-				showDetailsPopup(modalTitle, detailsToShow, statusType.equals("실패"));
+				showDetailsPopup(modalTitle, detailsToShow, isFail);
 			});
 		}
 
-		// VBox.setVgrow(pieChart, Priority.ALWAYS); // 파이차트가 가능한 많은 공간을 차지하도록
-		pieChart.setMaxHeight(300); // 높이 제한
+		pieChart.setMaxHeight(300);
 		pieChart.setPrefHeight(300);
 
 		totalCountsLabel = new Label();
@@ -76,30 +87,30 @@ public class OverallStatusControl extends CardControl {
 		totalCountsLabel.setAlignment(Pos.CENTER);
 		totalCountsLabel.setPadding(new Insets(5, 0, 0, 0));
 
-		this.getChildren().addAll(pieChart, totalCountsLabel);
-		// VBox가 부모 컨테이너에 맞게 크기 조절되도록 설정
+		Button btnReload = new Button("재조회");
+		btnReload.setOnAction(ev ->{
+			controller.reloadData();
+		});
+		this.getChildren().addAll(pieChart, totalCountsLabel, new HBox(btnReload));
 		VBox.setVgrow(this, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
 	}
 
-	private void initializeDummyData() {
-		successDetails = new ArrayList<>(
-				Arrays.asList(new InterfaceStatusDetail("IF-001", "주문 접수", "2024-05-28 10:00:00", "120ms", "API_GW_01"),
-						new InterfaceStatusDetail("IF-003", "상품 조회", "2024-05-28 10:02:00", "80ms", "PRODUCT_SVC_02")));
-		failDetails = new ArrayList<>(Arrays.asList(
-				new InterfaceStatusDetail("IF-002", "고객 인증", "2024-05-28 10:05:00", "500ms", "AUTH_SVC_01", "E401",
-						"인증 토큰 만료"),
-				new InterfaceStatusDetail("IF-004", "재고 확인", "2024-05-28 10:15:00", "1200ms", "INVENTORY_SVC_01",
-						"E503", "재고 서비스 응답 없음")));
+	private void loadDataFromDB() {
+		successDetails = dbManager.getInterfaceStatusDetails("성공");
+		failDetails = dbManager.getInterfaceStatusDetails("실패");
+        inProgressDetails = dbManager.getInterfaceStatusDetails("진행중");
 	}
 
 	private void updateTotalCounts() {
 		int successCount = successDetails.size();
 		int failCount = failDetails.size();
-		int total = successCount + failCount;
-		totalCountsLabel.setText(String.format("총 호출: %d건 (성공: %d건, 실패: %d건)", total, successCount, failCount));
+        int inProgressCount = inProgressDetails.size();
+		int total = successCount + failCount + inProgressCount;
+		totalCountsLabel.setText(String.format("총 호출: %d건 (성공: %d, 실패: %d, 진행중: %d)", total, successCount, failCount, inProgressCount));
 	}
-
+    
+    // showDetailsPopup 메서드는 기존과 동일 (isFail 파라미터로 에러 컬럼 표시 여부 결정)
 	private void showDetailsPopup(String title, List<InterfaceStatusDetail> details, boolean isFail) {
 		Dialog<Void> dialog = new Dialog<>();
 		dialog.initModality(Modality.APPLICATION_MODAL);
@@ -135,7 +146,6 @@ public class OverallStatusControl extends CardControl {
 		dialog.getDialogPane().setContent(tableView);
 		dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
 
-		// Dialog 크기 자동 조절
 		dialog.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
 		dialog.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
 
