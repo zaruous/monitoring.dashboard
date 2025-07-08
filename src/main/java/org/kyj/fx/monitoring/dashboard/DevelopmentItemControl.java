@@ -60,6 +60,8 @@ public class DevelopmentItemControl extends CardControl {
 		this.getChildren().addAll(kpiGrid, progressTitleLabel, progressBarBox);
 		VBox.setVgrow(this, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
+		
+		reloadData(); // 초기 데이터 로드
 	}
 
 	private Node createKpiCard(Label valueLabel, String description, Color bgColor, Color textColor) {
@@ -97,4 +99,17 @@ public class DevelopmentItemControl extends CardControl {
 		devProgressBar.setTotalItems(total);
 		devProgressBar.setCompletedItems(completed);
 	}
+	
+	  public void reloadData() {
+	        int total = dbManager.getDevelopmentItemCount("total");
+	        int inProgress = dbManager.getDevelopmentItemCount("inProgress");
+	        int completed = dbManager.getDevelopmentItemCount("completed");
+
+	        kpiTotalValueLabel.setText(String.valueOf(total));
+	        kpiInProgressValueLabel.setText(String.valueOf(inProgress));
+	        kpiCompletedValueLabel.setText(String.valueOf(completed));
+
+	        devProgressBar.setTotalItems(total);
+	        devProgressBar.setCompletedItems(completed);
+	    }
 }

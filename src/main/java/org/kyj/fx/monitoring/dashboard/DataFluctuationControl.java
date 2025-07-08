@@ -46,14 +46,14 @@ public class DataFluctuationControl extends CardControl {
 		fluctuationTableView.getColumns().addAll(nameCol, prevCol, currCol, rateCol);
 		VBox.setVgrow(fluctuationTableView, Priority.ALWAYS);
 
-		loadFluctuationData();
+		reloadData(); // 초기 데이터 로드
 
-		this.getChildren().add(fluctuationTableView);
-		VBox.setVgrow(this, Priority.ALWAYS);
-		HBox.setHgrow(this, Priority.ALWAYS);
+        this.getChildren().add(fluctuationTableView);
+        VBox.setVgrow(this, Priority.ALWAYS);
+        HBox.setHgrow(this, Priority.ALWAYS);
 	}
 
-	private void loadFluctuationData() {
-		fluctuationTableView.setItems(FXCollections.observableArrayList(dbManager.getTableFluctuations()));
-	}
+	public void reloadData() {
+        fluctuationTableView.setItems(FXCollections.observableArrayList(dbManager.getTableFluctuations()));
+    }
 }

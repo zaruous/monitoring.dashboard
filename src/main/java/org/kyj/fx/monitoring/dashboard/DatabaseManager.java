@@ -107,6 +107,13 @@ public class DatabaseManager {
         pstmt.close();
     }
     
+    /**
+     * 특정 상태의 모든 인터페이스 상세 정보를 데이터베이스에서 조회합니다.
+     * 생성자 호출 시 status 필드를 포함하도록 수정되었습니다.
+     *
+     * @param status 조회할 상태 ('성공', '실패', '진행중')
+     * @return 해당 상태의 InterfaceStatusDetail 리스트
+     */
     public List<InterfaceStatusDetail> getInterfaceStatusDetails(String status) {
         String sql = "SELECT * FROM interface_status WHERE status = ?";
         List<InterfaceStatusDetail> details = new ArrayList<>();
@@ -115,14 +122,14 @@ public class DatabaseManager {
             pstmt.setString(1, status);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                // 생성자에 DB에서 읽은 status 필드를 추가해야 합니다.
+                // InterfaceStatusDetail 생성자에 status 값을 올바르게 전달합니다.
                 details.add(new InterfaceStatusDetail(
                         rs.getString("id"),
                         rs.getString("name"),
                         rs.getString("timestamp"),
                         rs.getString("duration"),
                         rs.getString("server"),
-                        rs.getString("status"), // 누락되었던 status 필드 추가
+                        rs.getString("status"), // 수정된 부분: status 값 추가
                         rs.getString("error_code"),
                         rs.getString("error_message")));
             }
