@@ -115,10 +115,15 @@ public class DatabaseManager {
             pstmt.setString(1, status);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
+                // 생성자에 DB에서 읽은 status 필드를 추가해야 합니다.
                 details.add(new InterfaceStatusDetail(
-                        rs.getString("id"), rs.getString("name"),
-                        rs.getString("timestamp"), rs.getString("duration"),
-                        rs.getString("server"), rs.getString("error_code"),
+                        rs.getString("id"),
+                        rs.getString("name"),
+                        rs.getString("timestamp"),
+                        rs.getString("duration"),
+                        rs.getString("server"),
+                        rs.getString("status"), // 누락되었던 status 필드 추가
+                        rs.getString("error_code"),
                         rs.getString("error_message")));
             }
         } catch (SQLException e) {
@@ -179,5 +184,36 @@ public class DatabaseManager {
             System.out.println(e.getMessage());
         }
         return count;
+    }
+    
+    /**
+     * 새로운 인터페이스 상태 정보를 데이터베이스에 추가합니다.
+     * @param statusDetail 추가할 인터페이스 상태 상세 정보 DTO
+     * @return 데이터 추가 성공 시 true, 실패 시 false
+     */
+    public boolean addInterfaceStatus(InterfaceStatusDetail statusDetail) {
+        String sql = "INSERT INTO interface_status(id, name, timestamp, duration, server, status, error_code, error_message) VALUES(?,?,?,?,?,?,?,?)";
+
+        try (Connection conn = this.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, statusDetail.getId());
+            pstmt.setString(2, statusDetail.getName());
+            pstmt.setString(3, statusDetail.getTimestamp());
+            pstmt.setString(4, statusDetail.getDuration());
+            pstmt.setString(5, statusDetail.getServer());
+            
+            // 에러 코드가 있으면 '실패', 없으면 '성공'으로 기본 상태 지정
+            String status = (statusDetail.getErrorCode() != null) ? "실패" : "성공";
+            pstmt.setString(6, status);
+            
+            pstmt.setString(7, statusDetail.getErrorCode());
+            pstmt.setString(8, statusDetail.getErrorMessage());
+            
+            pstmt.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error adding interface status: " + e.getMessage());
+            return false;
+        }
     }
 }
