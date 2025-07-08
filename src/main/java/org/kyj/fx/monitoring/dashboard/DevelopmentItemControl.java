@@ -23,7 +23,7 @@ public class DevelopmentItemControl extends CardControl {
     private final Label kpiInProgressValueLabel;
     private final Label kpiCompletedValueLabel;
     private final ProgressIndicatorControl devProgressBar;
-    private final GoogleSheetsManager sheetsManager;
+//    private final GoogleSheetsManager sheetsManager;
 
     // --- 설정이 필요한 부분 ---
     // 여기에 데이터를 가져올 구글 시트의 ID를 입력하세요.
@@ -34,7 +34,7 @@ public class DevelopmentItemControl extends CardControl {
 
     public DevelopmentItemControl() {
         super("개발 아이템 정보");
-        this.sheetsManager = new GoogleSheetsManager();
+//        this.sheetsManager = new GoogleSheetsManager();
         this.setSpacing(15);
 
         GridPane kpiGrid = new GridPane();
@@ -77,17 +77,17 @@ public class DevelopmentItemControl extends CardControl {
         // 백그라운드 스레드에서 네트워크 작업 수행
         new Thread(() -> {
             try {
-                List<List<Object>> values = sheetsManager.getSheetData(SPREADSHEET_ID, SPREADSHEET_RANGE);
+//                List<List<Object>> values = sheetsManager.getSheetData(SPREADSHEET_ID, SPREADSHEET_RANGE);
 
-                if (values == null || values.isEmpty()) {
-                    showError("시트에서 데이터를 가져올 수 없습니다.");
-                    return;
-                }
+//                if (values == null || values.isEmpty()) {
+//                    showError("시트에서 데이터를 가져올 수 없습니다.");
+//                    return;
+//                }
                 
                 // N8(0,0), O8(0,1), P8(0,2)
-                List<Object> row = values.get(0);
-                int total = Integer.parseInt(row.get(0).toString()); // N8
-                int completed = Integer.parseInt(row.get(2).toString()); // P8
+//                List<Object> row = values.get(0);
+                int total = 100; //Integer.parseInt(row.get(0).toString()); // N8
+                int completed = 50; //Integer.parseInt(row.get(2).toString()); // P8
                 int inProgress = total - completed;
 
                 // UI 업데이트는 JavaFX Application Thread에서 수행
