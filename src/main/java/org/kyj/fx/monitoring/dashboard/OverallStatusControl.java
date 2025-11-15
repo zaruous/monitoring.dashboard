@@ -127,6 +127,10 @@ public class OverallStatusControl extends CardControl {
         totalCountsLabel.setText(String.format("총 호출: %d건 (성공: %d, 실패: %d, 진행중: %d)", total, successCount, failCount, inProgressCount));
     }
     
+    public String getSummaryText() {
+        return totalCountsLabel.getText();
+    }
+    
     // showDetailsPopup 메서드는 기존과 동일 (isFail 파라미터로 에러 컬럼 표시 여부 결정)
 	private void showDetailsPopup(String title, List<InterfaceStatusDetail> details, boolean isFail) {
 		Dialog<Void> dialog = new Dialog<>();

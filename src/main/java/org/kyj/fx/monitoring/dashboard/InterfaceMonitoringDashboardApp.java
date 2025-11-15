@@ -1,22 +1,37 @@
 package org.kyj.fx.monitoring.dashboard;
 
+import org.kyj.fx.monitoring.dashboard.plugin.MonitoringPlugin;
+import org.kyj.fx.monitoring.dashboard.plugin.PluginManager;
+
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class InterfaceMonitoringDashboardApp extends Application {
     // 각 컨트롤에 대한 참조를 저장할 필드
@@ -24,6 +39,8 @@ public class InterfaceMonitoringDashboardApp extends Application {
     private ScheduleMonitoringControl scheduleMonitoringControl;
     private DataFluctuationControl dataFluctuationControl;
     private DevelopmentItemControl developmentItemControl;
+    private GridPane mainGridPane;
+    private Scene rootScene;
 	@Override
 	public void start(Stage primaryStage) {
         DatabaseManager dbManager = DatabaseManager.getInstance();
@@ -32,6 +49,7 @@ public class InterfaceMonitoringDashboardApp extends Application {
         primaryStage.setTitle("인터페이스 모니터링 보드 (JavaFX)");
 
         GridPane gridPane = new GridPane();
+        this.mainGridPane = gridPane;
         gridPane.setHgap(20);
         gridPane.setVgap(20);
         gridPane.setPadding(new Insets(20));
@@ -78,18 +96,117 @@ public class InterfaceMonitoringDashboardApp extends Application {
         btnReload.setStyle("-fx-font-size: 14px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;");
         btnReload.setOnAction(ev -> reloadAllData()); // 액션 설정
 
-        HBox titleBox = new HBox(titleLabel, spacer, btnReload);
+        // 리포트 생성 버튼 추가
+        Button btnReport = new Button("리포트 생성");
+        btnReport.setStyle("-fx-font-size: 14px; -fx-background-color: #008CBA; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;");
+        btnReport.setOnAction(ev -> generateMarkdownReport());
+
+        HBox titleBox = new HBox(titleLabel, spacer, btnReport, btnReload);
+        titleBox.setSpacing(10); // 버튼 사이 간격
         titleBox.setAlignment(Pos.CENTER);
         titleBox.setPadding(new Insets(10, 20, 10, 20));
 
         BorderPane rootLayout = new BorderPane();
-        rootLayout.setTop(titleBox);
+        
+        // 메뉴바 생성
+        MenuBar menuBar = createMenuBar();
+        
+        VBox topContainer = new VBox(menuBar, titleBox);
+        rootLayout.setTop(topContainer);
         rootLayout.setCenter(gridPane);
         rootLayout.setStyle("-fx-background-color: #f3f4f6;");
 
-        Scene scene = new Scene(rootLayout, 1200, 850);
-        primaryStage.setScene(scene);
+        rootScene = new Scene(rootLayout, 1200, 850);
+        primaryStage.setScene(rootScene);
         primaryStage.show();
+	}
+
+	private MenuBar createMenuBar() {
+        MenuBar menuBar = new MenuBar();
+        
+        Menu homeMenu = new Menu("Home");
+        MenuItem dashboardItem = new MenuItem("Dashboard");
+        dashboardItem.setOnAction(e -> {
+            if (mainGridPane != null) {
+                BorderPane rootLayout = (BorderPane) rootScene.getRoot();
+                rootLayout.setCenter(mainGridPane);
+            }
+        });
+        homeMenu.getItems().add(dashboardItem);
+        
+        Menu pluginsMenu = new Menu("Plugins");
+        loadPlugins(pluginsMenu);
+        
+        menuBar.getMenus().addAll(homeMenu, pluginsMenu);
+        return menuBar;
+    }
+
+    private void loadPlugins(Menu pluginsMenu) {
+        List<MonitoringPlugin> plugins = PluginManager.loadPlugins();
+        Map<String, List<MonitoringPlugin>> categorizedPlugins = plugins.stream()
+                .collect(Collectors.groupingBy(MonitoringPlugin::getCategory));
+
+        categorizedPlugins.forEach((category, pluginList) -> {
+            Menu categoryMenu = new Menu(category);
+            pluginList.forEach(plugin -> {
+                MenuItem menuItem = new MenuItem(plugin.getName());
+                menuItem.setOnAction(e -> showPluginView(plugin));
+                categoryMenu.getItems().add(menuItem);
+            });
+            pluginsMenu.getItems().add(categoryMenu);
+        });
+    }
+
+    private void showPluginView(MonitoringPlugin plugin) {
+        Node pluginView = plugin.getMonitoringView();
+//        if (mainGridPane != null) {
+            BorderPane rootLayout = (BorderPane) rootScene.getRoot();
+            rootLayout.setCenter(pluginView);
+//        }
+    }
+
+	private void generateMarkdownReport() {
+	    FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save Report");
+	    fileChooser.setInitialFileName("Monitoring_Report_" + java.time.LocalDate.now() + ".md");
+	    fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Markdown Files", "*.md"));
+	    File file = fileChooser.showSaveDialog(null);
+
+	    if (file != null) {
+	        try (java.io.PrintWriter writer = new java.io.PrintWriter(file)) {
+	            StringBuilder report = new StringBuilder();
+	            
+	            // 1. 전체 인터페이스 현황
+	            report.append("# 모니터링 보고서\n\n");
+	            report.append("## 1. 전체 인터페이스 현황\n");
+	            report.append(overallStatusControl.getSummaryText()).append("\n\n");
+
+	            // 2. 데이터 변동률
+	            report.append("## 2. 데이터 변동률\n");
+	            report.append("| 테이블 명 | 이전 로우 수 | 현재 로우 수 | 변동률 |\n");
+	            report.append("|---|---|---|---|\n");
+	            for (TableFluctuation item : dataFluctuationControl.getFluctuationData()) {
+	                report.append(String.format("| %s | %d | %d | %s |\n",
+	                        item.getTableName(), item.getPreviousRowCount(), item.getCurrentRowCount(), item.getChangeRate()));
+	            }
+	            report.append("\n");
+
+	            // 3. 스케줄 모니터링 현황
+	            report.append("## 3. 스케줄 모니터링 현황\n");
+	            report.append("| 스케줄 ID | 인터페이스 명 | 상태 | 실행 시간 (소요 시간) |\n");
+	            report.append("|---|---|---|---|\n");
+	            for (ScheduleEntry item : scheduleMonitoringControl.getScheduleData()) {
+	                report.append(String.format("| %s | %s | %s | %s |\n",
+	                        item.getScheduleId(), item.getInterfaceName(), item.getStatus(), item.getExecutionTimeDisplay()));
+	            }
+
+	            writer.println(report.toString());
+	            
+	        } catch (java.io.IOException e) {
+	            e.printStackTrace();
+	            // 사용자에게 오류 알림
+	        }
+	    }
 	}
 
 	 /**

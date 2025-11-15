@@ -31,6 +31,7 @@
     </dependencyManagement>
 
     <dependencies>
+
         <!-- JavaFX Dependencies -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -87,7 +88,7 @@
                         <phase>package</phase>
                         <configuration>
                             <tasks>
-                                <echo file="${project.build.directory}/runme.bat">start jlink-image\bin\javaw -jar modules\${project.artifactId}-${project.version}.jar</echo>
+                                <echo file="${project.build.directory}/runme.bat">start jlink-image\bin\org.kyj.fx.bat</echo>
                             </tasks>
                         </configuration>
                         <goals>
@@ -151,6 +152,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>

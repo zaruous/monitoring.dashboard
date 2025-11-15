@@ -72,4 +72,8 @@ public class ScheduleMonitoringControl extends CardControl {
             scheduleTableView.setPlaceholder(new Label("해당 날짜의 스케줄 정보가 없습니다."));
         }
     }
+	
+	public List<ScheduleEntry> getScheduleData() {
+        return scheduleTableView.getItems();
+    }
 }

@@ -10,6 +10,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.util.List;
+
 public class DataFluctuationControl extends CardControl {
 	private TableView<TableFluctuation> fluctuationTableView;
     private DatabaseManager dbManager;
@@ -55,5 +57,9 @@ public class DataFluctuationControl extends CardControl {
 
 	public void reloadData() {
         fluctuationTableView.setItems(FXCollections.observableArrayList(dbManager.getTableFluctuations()));
+    }
+	
+	public List<TableFluctuation> getFluctuationData() {
+        return fluctuationTableView.getItems();
     }
 }
