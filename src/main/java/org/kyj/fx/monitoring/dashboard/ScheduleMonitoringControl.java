@@ -18,7 +18,7 @@ public class ScheduleMonitoringControl extends CardControl {
 
 	public ScheduleMonitoringControl() {
 		super("스케줄 모니터링");
-		dbManager = new DatabaseManager();
+		dbManager = DatabaseManager.getInstance();
 
 		scheduleDatePicker = new DatePicker(LocalDate.now());
 		scheduleDatePicker.setOnAction(event -> reloadData());

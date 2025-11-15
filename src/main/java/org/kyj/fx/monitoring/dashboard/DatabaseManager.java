@@ -1,226 +1,125 @@
 package org.kyj.fx.monitoring.dashboard;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 데이터 제공자를 관리하고 애플리케이션에 데이터를 제공하는 중앙 클래스입니다.
+ * Strategy Pattern의 Context 역할을 하며, Singleton Pattern으로 구현되어
+ * 애플리케이션 전체에서 단일 인스턴스를 통해 데이터에 접근할 수 있도록 합니다.
+ *
+ * 사용된 디자인 패턴:
+ * 1. Strategy Pattern: DataProvider 인터페이스를 통해 데이터 소스를 동적으로 교체할 수 있습니다.
+ *    (예: SqliteDataProvider, MockDataProvider). 이를 통해 데이터베이스 구현의 변경이나
+ *    테스트 환경으로의 전환이 유연해집니다.
+ *    - Context: DatabaseManager
+ *    - Strategy: DataProvider
+ *    - ConcreteStrategy: SqliteDataProvider, MockDataProvider
+ *
+ * 2. Singleton Pattern: 애플리케이션 전체에서 단 하나의 DatabaseManager 인스턴스만 존재하도록 보장합니다.
+ *    이를 통해 데이터 제공자 설정(Strategy 설정)을 일관되게 유지하고, 어디서든 동일한 데이터 소스에
+ *    접근할 수 있습니다.
+ */
 public class DatabaseManager {
 
-    private static final String DB_URL = "jdbc:sqlite:monitoring.db";
+    private static final DatabaseManager instance = new DatabaseManager();
+    private DataProvider dataProvider;
 
-    public Connection connect() {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(DB_URL);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return conn;
+    // private 생성자로 외부에서 인스턴스 생성을 막음 (Singleton)
+    private DatabaseManager() {
+        // 기본 데이터 제공자를 SqliteDataProvider로 설정합니다.
+        this.dataProvider = new SqliteDataProvider();
     }
 
-    public void initializeDatabase() {
-        try (Connection conn = connect();
-             Statement stmt = conn.createStatement()) {
-
-            // 테이블 생성
-            stmt.execute("DROP TABLE IF EXISTS interface_status;");
-            stmt.execute("CREATE TABLE interface_status (" +
-                         "id TEXT PRIMARY KEY, " +
-                         "name TEXT NOT NULL, " +
-                         "timestamp TEXT NOT NULL, " +
-                         "duration TEXT, " +
-                         "server TEXT, " +
-                         "status TEXT NOT NULL, " + // '성공', '실패', '진행중'
-                         "error_code TEXT, " +
-                         "error_message TEXT);");
-
-            stmt.execute("DROP TABLE IF EXISTS schedule_entries;");
-            stmt.execute("CREATE TABLE schedule_entries (" +
-                         "schedule_id TEXT PRIMARY KEY, " +
-                         "interface_name TEXT NOT NULL, " +
-                         "status TEXT NOT NULL, " +
-                         "execution_time TEXT NOT NULL, " +
-                         "duration TEXT, " +
-                         "schedule_date TEXT NOT NULL);");
-            
-            stmt.execute("DROP TABLE IF EXISTS table_fluctuation;");
-            stmt.execute("CREATE TABLE table_fluctuation (" +
-                         "table_name TEXT PRIMARY KEY, " +
-                         "previous_row_count INTEGER NOT NULL, " +
-                         "current_row_count INTEGER NOT NULL);");
-            
-             stmt.execute("DROP TABLE IF EXISTS development_items;");
-             stmt.execute("CREATE TABLE development_items (" +
-                          "status TEXT PRIMARY KEY, " + // 'total', 'inProgress', 'completed'
-                          "count INTEGER NOT NULL);");
-
-
-            // 기본 데이터 삽입
-            insertInitialData(conn);
-
-        } catch (SQLException e) {
-            System.out.println("Database initialization error: " + e.getMessage());
-        }
-    }
-
-    private void insertInitialData(Connection conn) throws SQLException {
-        // Interface Status Data
-        PreparedStatement pstmt = conn.prepareStatement("INSERT INTO interface_status VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
-        // 성공
-        pstmt.setString(1, "IF-001"); pstmt.setString(2, "주문 접수"); pstmt.setString(3, "2024-05-28 10:00:00"); pstmt.setString(4, "120ms"); pstmt.setString(5, "API_GW_01"); pstmt.setString(6, "성공"); pstmt.setString(7, null); pstmt.setString(8, null); pstmt.addBatch();
-        pstmt.setString(1, "IF-003"); pstmt.setString(2, "상품 조회"); pstmt.setString(3, "2024-05-28 10:02:00"); pstmt.setString(4, "80ms"); pstmt.setString(5, "PRODUCT_SVC_02"); pstmt.setString(6, "성공"); pstmt.setString(7, null); pstmt.setString(8, null); pstmt.addBatch();
-        // 실패
-        pstmt.setString(1, "IF-002"); pstmt.setString(2, "고객 인증"); pstmt.setString(3, "2024-05-28 10:05:00"); pstmt.setString(4, "500ms"); pstmt.setString(5, "AUTH_SVC_01"); pstmt.setString(6, "실패"); pstmt.setString(7, "E401"); pstmt.setString(8, "인증 토큰 만료"); pstmt.addBatch();
-        pstmt.setString(1, "IF-004"); pstmt.setString(2, "재고 확인"); pstmt.setString(3, "2024-05-28 10:15:00"); pstmt.setString(4, "1200ms"); pstmt.setString(5, "INVENTORY_SVC_01"); pstmt.setString(6, "실패"); pstmt.setString(7, "E503"); pstmt.setString(8, "재고 서비스 응답 없음"); pstmt.addBatch();
-        // 진행중
-        pstmt.setString(1, "IF-005"); pstmt.setString(2, "배송 상태 업데이트"); pstmt.setString(3, "2024-05-28 11:00:00"); pstmt.setString(4, "N/A"); pstmt.setString(5, "SHIPPING_SVC_01"); pstmt.setString(6, "진행중"); pstmt.setString(7, null); pstmt.setString(8, null); pstmt.addBatch();
-        pstmt.executeBatch();
-
-        // Schedule Entries Data
-        pstmt = conn.prepareStatement("INSERT INTO schedule_entries VALUES (?, ?, ?, ?, ?, ?);");
-        pstmt.setString(1, "SCH-001"); pstmt.setString(2, "일일 판매 집계"); pstmt.setString(3, "성공"); pstmt.setString(4, "2024-05-28 02:00:15"); pstmt.setString(5, "5분 10초"); pstmt.setString(6, "2024-05-28"); pstmt.addBatch();
-        pstmt.setString(1, "SCH-002"); pstmt.setString(2, "데이터 백업"); pstmt.setString(3, "성공"); pstmt.setString(4, "2024-05-28 03:00:05"); pstmt.setString(5, "12분 30초"); pstmt.setString(6, "2024-05-28"); pstmt.addBatch();
-        pstmt.setString(1, "SCH-003"); pstmt.setString(2, "사용자 활동 로그 분석"); pstmt.setString(3, "실패"); pstmt.setString(4, "2024-05-27 04:00:00"); pstmt.setString(5, "2분 (오류 발생)"); pstmt.setString(6, "2024-05-27"); pstmt.addBatch();
-        pstmt.executeBatch();
-        
-        // Table Fluctuation Data
-        pstmt = conn.prepareStatement("INSERT INTO table_fluctuation VALUES (?, ?, ?);");
-        pstmt.setString(1, "TB_ORDERS"); pstmt.setInt(2, 10250); pstmt.setInt(3, 10570); pstmt.addBatch();
-        pstmt.setString(1, "TB_CUSTOMERS"); pstmt.setInt(2, 5120); pstmt.setInt(3, 5135); pstmt.addBatch();
-        pstmt.setString(1, "TB_PRODUCTS"); pstmt.setInt(2, 850); pstmt.setInt(3, 845); pstmt.addBatch();
-        pstmt.executeBatch();
-
-        // Development Items Data
-        pstmt = conn.prepareStatement("INSERT INTO development_items VALUES (?, ?);");
-        pstmt.setString(1, "total"); pstmt.setInt(2, 25); pstmt.addBatch();
-        pstmt.setString(1, "inProgress"); pstmt.setInt(2, 7); pstmt.addBatch();
-        pstmt.setString(1, "completed"); pstmt.setInt(2, 15); pstmt.addBatch();
-        pstmt.executeBatch();
-        
-        pstmt.close();
-    }
-    
     /**
-     * 특정 상태의 모든 인터페이스 상세 정보를 데이터베이스에서 조회합니다.
-     * 생성자 호출 시 status 필드를 포함하도록 수정되었습니다.
+     * DatabaseManager의 싱글턴 인스턴스를 반환합니다.
+     *
+     * @return DatabaseManager 인스턴스
+     */
+    public static DatabaseManager getInstance() {
+        return instance;
+    }
+
+    /**
+     * 사용할 데이터 제공자(Strategy)를 설정합니다.
+     *
+     * @param dataProvider 사용할 DataProvider 구현체
+     */
+    public void setDataProvider(DataProvider dataProvider) {
+        this.dataProvider = dataProvider;
+    }
+
+    /**
+     * 현재 설정된 데이터 제공자를 사용하여 데이터베이스를 초기화합니다.
+     */
+    public void initializeDatabase() {
+        if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
+        }
+        dataProvider.initializeDatabase();
+    }
+
+    /**
+     * 특정 상태의 모든 인터페이스 상세 정보를 조회합니다.
      *
      * @param status 조회할 상태 ('성공', '실패', '진행중')
      * @return 해당 상태의 InterfaceStatusDetail 리스트
      */
     public List<InterfaceStatusDetail> getInterfaceStatusDetails(String status) {
-        String sql = "SELECT * FROM interface_status WHERE status = ?";
-        List<InterfaceStatusDetail> details = new ArrayList<>();
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, status);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                // InterfaceStatusDetail 생성자에 status 값을 올바르게 전달합니다.
-                details.add(new InterfaceStatusDetail(
-                        rs.getString("id"),
-                        rs.getString("name"),
-                        rs.getString("timestamp"),
-                        rs.getString("duration"),
-                        rs.getString("server"),
-                        rs.getString("status"), // 수정된 부분: status 값 추가
-                        rs.getString("error_code"),
-                        rs.getString("error_message")));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
         }
-        return details;
+        return dataProvider.getInterfaceStatusDetails(status);
     }
 
-    public List<ScheduleEntry> getScheduleEntries(LocalDate date) {
-        String sql = "SELECT * FROM schedule_entries WHERE schedule_date = ?";
-        List<ScheduleEntry> entries = new ArrayList<>();
-        String dateString = date.format(DateTimeFormatter.ISO_DATE);
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, dateString);
-            ResultSet rs = pstmt.executeQuery();
-            while(rs.next()) {
-                entries.add(new ScheduleEntry(
-                    rs.getString("schedule_id"), rs.getString("interface_name"),
-                    rs.getString("status"), rs.getString("execution_time"),
-                    rs.getString("duration")));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return entries;
-    }
-    
-    public List<TableFluctuation> getTableFluctuations() {
-        String sql = "SELECT * FROM table_fluctuation";
-        List<TableFluctuation> fluctuations = new ArrayList<>();
-        try (Connection conn = this.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                fluctuations.add(new TableFluctuation(
-                    rs.getString("table_name"),
-                    rs.getInt("previous_row_count"),
-                    rs.getInt("current_row_count")));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return fluctuations;
-    }
-    
-    public int getDevelopmentItemCount(String status) {
-        String sql = "SELECT count FROM development_items WHERE status = ?";
-        int count = 0;
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, status);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                count = rs.getInt("count");
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return count;
-    }
-    
     /**
-     * 새로운 인터페이스 상태 정보를 데이터베이스에 추가합니다.
+     * 특정 날짜의 스케줄 엔트리 목록을 조회합니다.
+     *
+     * @param date 조회할 날짜
+     * @return 해당 날짜의 ScheduleEntry 리스트
+     */
+    public List<ScheduleEntry> getScheduleEntries(LocalDate date) {
+        if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
+        }
+        return dataProvider.getScheduleEntries(date);
+    }
+
+    /**
+     * 테이블 데이터 변동 현황 목록을 조회합니다.
+     *
+     * @return TableFluctuation 리스트
+     */
+    public List<TableFluctuation> getTableFluctuations() {
+        if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
+        }
+        return dataProvider.getTableFluctuations();
+    }
+
+    /**
+     * 개발 항목의 상태별 개수를 조회합니다.
+     *
+     * @param status 조회할 상태 ('total', 'inProgress', 'completed')
+     * @return 해당 상태의 개발 항목 개수
+     */
+    public int getDevelopmentItemCount(String status) {
+        if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
+        }
+        return dataProvider.getDevelopmentItemCount(status);
+    }
+
+    /**
+     * 새로운 인터페이스 상태 정보를 추가합니다.
+     *
      * @param statusDetail 추가할 인터페이스 상태 상세 정보 DTO
      * @return 데이터 추가 성공 시 true, 실패 시 false
      */
     public boolean addInterfaceStatus(InterfaceStatusDetail statusDetail) {
-        String sql = "INSERT INTO interface_status(id, name, timestamp, duration, server, status, error_code, error_message) VALUES(?,?,?,?,?,?,?,?)";
-
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, statusDetail.getId());
-            pstmt.setString(2, statusDetail.getName());
-            pstmt.setString(3, statusDetail.getTimestamp());
-            pstmt.setString(4, statusDetail.getDuration());
-            pstmt.setString(5, statusDetail.getServer());
-            
-            // 에러 코드가 있으면 '실패', 없으면 '성공'으로 기본 상태 지정
-            String status = (statusDetail.getErrorCode() != null) ? "실패" : "성공";
-            pstmt.setString(6, status);
-            
-            pstmt.setString(7, statusDetail.getErrorCode());
-            pstmt.setString(8, statusDetail.getErrorMessage());
-            
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("Error adding interface status: " + e.getMessage());
-            return false;
+        if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
         }
+        return dataProvider.addInterfaceStatus(statusDetail);
     }
 }

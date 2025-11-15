@@ -26,7 +26,7 @@ public class InterfaceMonitoringDashboardApp extends Application {
     private DevelopmentItemControl developmentItemControl;
 	@Override
 	public void start(Stage primaryStage) {
-        DatabaseManager dbManager = new DatabaseManager();
+        DatabaseManager dbManager = DatabaseManager.getInstance();
         dbManager.initializeDatabase();
 
         primaryStage.setTitle("인터페이스 모니터링 보드 (JavaFX)");

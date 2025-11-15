@@ -1,5 +1,6 @@
 package org.kyj.fx.monitoring.dashboard;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -8,6 +9,7 @@ import javafx.geometry.Pos;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -26,10 +28,10 @@ public class OverallStatusControl extends CardControl {
     private List<InterfaceStatusDetail> failDetails;
     private List<InterfaceStatusDetail> inProgressDetails;
     private final DatabaseManager dbManager;
-
+    DatePicker datePicker;
     public OverallStatusControl() {
         super("전체 인터페이스 현황");
-        dbManager = new DatabaseManager();
+        dbManager = DatabaseManager.getInstance();
         setupUI();
         reloadData(); // 초기 데이터 로드
     }
@@ -44,7 +46,9 @@ public class OverallStatusControl extends CardControl {
         totalCountsLabel.setAlignment(Pos.CENTER);
         totalCountsLabel.setPadding(new Insets(5, 0, 0, 0));
 
-        this.getChildren().addAll(pieChart, totalCountsLabel);
+        
+        datePicker = new DatePicker(LocalDate.now());
+		this.getChildren().addAll(new HBox(new Label("날짜 선택 : "), datePicker), pieChart, totalCountsLabel);
         VBox.setVgrow(this, Priority.ALWAYS);
         HBox.setHgrow(this, Priority.ALWAYS);
     }

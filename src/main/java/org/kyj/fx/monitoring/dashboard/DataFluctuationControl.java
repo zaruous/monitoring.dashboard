@@ -16,7 +16,7 @@ public class DataFluctuationControl extends CardControl {
     
 	public DataFluctuationControl() {
 		super("데이터 변동률 (테이블 로우 수)");
-        dbManager = new DatabaseManager();
+        dbManager = DatabaseManager.getInstance();
 
 		fluctuationTableView = new TableView<>();
 		// 컬럼 설정 (기존과 동일)

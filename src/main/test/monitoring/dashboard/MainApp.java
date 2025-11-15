@@ -6,7 +6,7 @@ import org.kyj.fx.monitoring.dashboard.InterfaceStatusDetail;
 public class MainApp { // 또는 테스트를 위한 다른 클래스
 
     public static void main(String[] args) {
-        DatabaseManager dbManager = new DatabaseManager();
+        DatabaseManager dbManager = DatabaseManager.getInstance();
 
         // 1. '진행중' 상태의 데이터 추가
         InterfaceStatusDetail inProgressData = new InterfaceStatusDetail(
