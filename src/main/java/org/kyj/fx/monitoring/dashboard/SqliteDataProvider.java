@@ -36,7 +36,11 @@ public class SqliteDataProvider implements DataProvider {
              Statement stmt = conn.createStatement()) {
 
             // 테이블 생성
-            stmt.execute("DROP TABLE IF EXISTS interface_status;");
+//          stmt.execute("DROP TABLE IF EXISTS interface_status;");
+//          stmt.execute("DROP TABLE IF EXISTS schedule_entries;");
+//          stmt.execute("DROP TABLE IF EXISTS table_fluctuation;");
+//          stmt.execute("DROP TABLE IF EXISTS development_items;");
+        	
             stmt.execute("CREATE TABLE interface_status (" +
                          "id TEXT PRIMARY KEY, " +
                          "name TEXT NOT NULL, " +
@@ -47,7 +51,7 @@ public class SqliteDataProvider implements DataProvider {
                          "error_code TEXT, " +
                          "error_message TEXT);");
 
-            stmt.execute("DROP TABLE IF EXISTS schedule_entries;");
+
             stmt.execute("CREATE TABLE schedule_entries (" +
                          "schedule_id TEXT PRIMARY KEY, " +
                          "interface_name TEXT NOT NULL, " +
@@ -56,13 +60,13 @@ public class SqliteDataProvider implements DataProvider {
                          "duration TEXT, " +
                          "schedule_date TEXT NOT NULL);");
             
-            stmt.execute("DROP TABLE IF EXISTS table_fluctuation;");
+
             stmt.execute("CREATE TABLE table_fluctuation (" +
                          "table_name TEXT PRIMARY KEY, " +
                          "previous_row_count INTEGER NOT NULL, " +
                          "current_row_count INTEGER NOT NULL);");
             
-             stmt.execute("DROP TABLE IF EXISTS development_items;");
+
              stmt.execute("CREATE TABLE development_items (" +
                           "status TEXT PRIMARY KEY, " + // 'total', 'inProgress', 'completed'
                           "count INTEGER NOT NULL);");
