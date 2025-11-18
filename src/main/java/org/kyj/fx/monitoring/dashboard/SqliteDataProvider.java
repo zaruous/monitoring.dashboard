@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -224,4 +225,25 @@ public class SqliteDataProvider implements DataProvider {
             return false;
         }
     }
+
+	@Override
+	public List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date) {
+		String sql = "SELECT error_code, error_message, COUNT(*) as count, GROUP_CONCAT(timestamp) as timestamps "
+				+ "FROM interface_status WHERE status = '실패' AND timestamp LIKE ? "
+				+ "GROUP BY error_code, error_message";
+		List<ServiceErrorEntry> entries = new ArrayList<>();
+		String datePattern = date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + "%";
+
+		try (Connection conn = this.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, datePattern);
+			ResultSet rs = pstmt.executeQuery();
+			while (rs.next()) {
+				entries.add(new ServiceErrorEntry(rs.getString("error_code"), rs.getString("error_message"), "",
+						rs.getInt("count"), rs.getString("timestamps")));
+			}
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return entries;
+	}
 }

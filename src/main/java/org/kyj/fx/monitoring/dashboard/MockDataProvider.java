@@ -79,4 +79,9 @@ public class MockDataProvider implements DataProvider {
     public boolean addInterfaceStatus(InterfaceStatusDetail statusDetail) {
         return interfaceStatusDetails.add(statusDetail);
     }
+
+	@Override
+	public List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date) {
+		return new ArrayList<>();
+	}
 }

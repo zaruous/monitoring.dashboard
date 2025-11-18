@@ -21,4 +21,6 @@ public interface DataProvider {
     int getDevelopmentItemCount(String status);
 
     boolean addInterfaceStatus(InterfaceStatusDetail statusDetail);
+
+	List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date);
 }

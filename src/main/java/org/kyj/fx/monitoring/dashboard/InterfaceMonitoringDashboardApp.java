@@ -37,7 +37,7 @@ public class InterfaceMonitoringDashboardApp extends Application {
     private OverallStatusControl overallStatusControl;
     private ScheduleMonitoringControl scheduleMonitoringControl;
     private DataFluctuationControl dataFluctuationControl;
-    private DevelopmentItemControl developmentItemControl;
+    private ServiceErrorMonitoringControl serviceErrorMonitoringControl; // 변경
     private GridPane mainGridPane;
     private Scene rootScene;
 	@Override
@@ -60,15 +60,15 @@ public class InterfaceMonitoringDashboardApp extends Application {
         overallStatusControl = new OverallStatusControl();
         scheduleMonitoringControl = new ScheduleMonitoringControl();
         dataFluctuationControl = new DataFluctuationControl();
-        developmentItemControl = new DevelopmentItemControl();
+        serviceErrorMonitoringControl = new ServiceErrorMonitoringControl(); // 변경
 
         GridPane.setConstraints(overallStatusControl, 0, 0);
         GridPane.setConstraints(scheduleMonitoringControl, 1, 0);
         GridPane.setConstraints(dataFluctuationControl, 0, 1);
-        GridPane.setConstraints(developmentItemControl, 1, 1);
+        GridPane.setConstraints(serviceErrorMonitoringControl, 1, 1); // 변경
 
         gridPane.getChildren().addAll(overallStatusControl, scheduleMonitoringControl, dataFluctuationControl,
-                developmentItemControl);
+                serviceErrorMonitoringControl); // 변경
 
 		// 컬럼 및 로우 제약 조건 설정 (균등하게 공간 분배)
 		ColumnConstraints col1 = new ColumnConstraints();
@@ -200,12 +200,20 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	                report.append(String.format("| %s | %s | %s | %s |\n",
 	                        item.getScheduleId(), item.getInterfaceName(), item.getStatus(), item.getExecutionTimeDisplay()));
 	            }
+	            
+	            // 4. 서비스 에러 내역
+	            report.append("\n## 4. 서비스 에러 내역\n");
+	            report.append("| 에러 코드 | 에러 메시지 | 에러 설명 | 횟수 |\n");
+	            report.append("|---|---|---|---|\n");
+	            for (ServiceErrorEntry item : serviceErrorMonitoringControl.getServiceErrorData()) {
+	                report.append(String.format("| %s | %s | %s | %d |\n",
+	                        item.getErrorCode(), item.getErrorMsg(), item.getErrorDesc(), item.getCount()));
+	            }
 
 	            writer.println(report.toString());
 	            
 	        } catch (java.io.IOException e) {
 	            e.printStackTrace();
-	            // 사용자에게 오류 알림
 	        }
 	    }
 	}
@@ -218,7 +226,7 @@ public class InterfaceMonitoringDashboardApp extends Application {
         overallStatusControl.reloadData();
         scheduleMonitoringControl.reloadData();
         dataFluctuationControl.reloadData();
-        developmentItemControl.reloadData();
+        serviceErrorMonitoringControl.reloadData();
         System.out.println("Data reloaded.");
     }
     

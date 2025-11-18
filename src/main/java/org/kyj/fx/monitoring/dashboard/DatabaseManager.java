@@ -122,4 +122,11 @@ public class DatabaseManager {
         }
         return dataProvider.addInterfaceStatus(statusDetail);
     }
+
+	public List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date) {
+		if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
+        }
+        return dataProvider.getServiceErrorEntries(date);
+	}
 }

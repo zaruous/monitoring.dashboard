@@ -200,4 +200,44 @@ public class AkcDataProvider implements DataProvider {
 		return false;
 	}
 
+	@Override
+	public List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date) {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT\n");
+		sb.append("m.ERROR_CODE , m.ERROR_MSG, m.ERROR_DESC, COUNT(1) AS COUNT\n");
+		sb.append("FROM\n");
+		sb.append("	MADMERRLOG(nolock) m \n");
+		sb.append("WHERE\n");
+		sb.append("	1 = 1\n");
+		sb.append("AND m.TRAN_TIME >= CONVERT (DATETIME,  ? + ' 00:00:00')\n");
+		sb.append("AND m.TRAN_TIME < CONVERT (DATETIME,  ? + ' 23:59:59')\n");
+		sb.append("\n");
+		sb.append("GROUP BY m.ERROR_CODE , m.ERROR_MSG , m.ERROR_DESC\n");
+		
+		String fromDate = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		String toDate = date.plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		
+		List<ServiceErrorEntry> details = new ArrayList<>();
+		try (Connection conn = this.connect();
+	             PreparedStatement pstmt = conn.prepareStatement(sb.toString())) {
+	            pstmt.setString(1, fromDate);
+	            pstmt.setString(2, toDate);
+	            ResultSet rs = pstmt.executeQuery();
+	            while (rs.next()) {
+	                details.add(new ServiceErrorEntry(
+	                        rs.getString("ERROR_CODE"),
+	                        rs.getString("ERROR_MSG"),
+	                        rs.getString("ERROR_DESC"),
+	                        rs.getInt("COUNT"),
+	                        ""
+	                        ));
+	            }
+	        } catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	        }
+		
+		return details;
+	}
+
 }

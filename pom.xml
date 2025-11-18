@@ -130,20 +130,19 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>21</release>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.ow2.asm</groupId>
-                        <artifactId>asm</artifactId>
-                        <version>6.2.1</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>                                            
+                <version>3.8.0</version>                                                                  
+                <configuration>                                                                           
+                    <release>21</release>                                                                 
+                </configuration>                                                                          
+                <dependencies>                                                                            
+                    <dependency>                                                                          
+                        <groupId>org.ow2.asm</groupId>                                                    
+                        <artifactId>asm</artifactId>                                                      
+                        <version>6.2.1</version>                                                          
+                    </dependency>                                                                         
+                </dependencies>                                                                           
+            </plugin>            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
