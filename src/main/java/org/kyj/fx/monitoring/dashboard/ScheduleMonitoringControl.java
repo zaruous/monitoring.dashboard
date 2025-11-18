@@ -76,4 +76,8 @@ public class ScheduleMonitoringControl extends CardControl {
 	public List<ScheduleEntry> getScheduleData() {
         return scheduleTableView.getItems();
     }
+	
+	public LocalDate getSelectedDate() {
+		return scheduleDatePicker.getValue();
+	}
 }

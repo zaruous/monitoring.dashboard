@@ -238,4 +238,9 @@ public class OverallStatusControl extends CardControl {
 
 		dialog.showAndWait();
 	}
+	
+	public LocalDate getSelectedDate() {
+		return datePicker.getValue();
+	}
+	
 }

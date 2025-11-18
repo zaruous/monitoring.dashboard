@@ -1,5 +1,8 @@
 package org.kyj.fx.monitoring.dashboard;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import javafx.collections.FXCollections;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -9,8 +12,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-
-import java.util.List;
 
 public class DataFluctuationControl extends CardControl {
 	private TableView<TableFluctuation> fluctuationTableView;
@@ -58,6 +59,7 @@ public class DataFluctuationControl extends CardControl {
 	public void reloadData() {
         fluctuationTableView.setItems(FXCollections.observableArrayList(dbManager.getTableFluctuations()));
     }
+	
 	
 	public List<TableFluctuation> getFluctuationData() {
         return fluctuationTableView.getItems();

@@ -1,6 +1,7 @@
 package org.kyj.fx.monitoring.dashboard;
 
 import java.io.File;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -181,7 +182,9 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	            report.append("# 모니터링 보고서\n\n");
 	            report.append("## 1. 전체 인터페이스 현황\n");
 	            report.append(overallStatusControl.getSummaryText()).append("\n\n");
-
+	            LocalDate selectedDate = overallStatusControl.getSelectedDate();
+	            report.append("### 조회일: ").append(selectedDate != null ? selectedDate.toString() : "N/A").append("\n\n");
+	            
 	            // 2. 데이터 변동률
 	            report.append("## 2. 데이터 변동률\n");
 	            report.append("| 테이블 명 | 이전 로우 수 | 현재 로우 수 | 변동률 |\n");
@@ -193,7 +196,9 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	            report.append("\n");
 
 	            // 3. 스케줄 모니터링 현황
+	            selectedDate = scheduleMonitoringControl.getSelectedDate();
 	            report.append("## 3. 스케줄 모니터링 현황\n");
+	            report.append("### 조회일: ").append(selectedDate != null ? selectedDate.toString() : "N/A").append("\n\n");
 	            report.append("| 스케줄 ID | 인터페이스 명 | 상태 | 실행 시간 (소요 시간) |\n");
 	            report.append("|---|---|---|---|\n");
 	            for (ScheduleEntry item : scheduleMonitoringControl.getScheduleData()) {
@@ -203,6 +208,8 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	            
 	            // 4. 서비스 에러 내역
 	            report.append("\n## 4. 서비스 에러 내역\n");
+	            selectedDate = serviceErrorMonitoringControl.getSelectedDate();
+	            report.append("### 조회일: ").append(selectedDate != null ? selectedDate.toString() : "N/A").append("\n\n");
 	            report.append("| 에러 코드 | 에러 메시지 | 에러 설명 | 횟수 |\n");
 	            report.append("|---|---|---|---|\n");
 	            for (ServiceErrorEntry item : serviceErrorMonitoringControl.getServiceErrorData()) {
@@ -229,6 +236,10 @@ public class InterfaceMonitoringDashboardApp extends Application {
         serviceErrorMonitoringControl.reloadData();
         System.out.println("Data reloaded.");
     }
+    
+    public LocalDate getSelectedDate() {
+		return overallStatusControl.getSelectedDate();
+	}
     
 	public static void main(String[] args) {
 		launch(args);

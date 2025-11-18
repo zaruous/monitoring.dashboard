@@ -72,4 +72,8 @@ public class ServiceErrorMonitoringControl extends CardControl {
     public List<ServiceErrorEntry> getServiceErrorData() {
         return tableView.getItems();
     }
+    
+    public LocalDate getSelectedDate() {
+		return datePicker.getValue();
+    }
 }
