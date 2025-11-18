@@ -33,9 +33,9 @@ public class MockDataProvider implements DataProvider {
         developmentItems.clear();
 
         // Interface Status Mock Data
-        interfaceStatusDetails.add(new InterfaceStatusDetail("IF-MOCK-001", "Mock 주문 접수", "2024-05-28 10:00:00", "10ms", "MOCK_GW_01", "성공", null, null));
-        interfaceStatusDetails.add(new InterfaceStatusDetail("IF-MOCK-002", "Mock 고객 인증", "2024-05-28 10:05:00", "50ms", "MOCK_AUTH_01", "실패", "E401", "Mock 인증 토큰 만료"));
-        interfaceStatusDetails.add(new InterfaceStatusDetail("IF-MOCK-003", "Mock 배송 상태", "2024-05-28 11:00:00", "N/A", "MOCK_SHIP_01", "진행중", null, null));
+        interfaceStatusDetails.add(new InterfaceStatusDetail("IF-MOCK-001", "Mock 주문 접수", "2024-05-28 10:00:00", "10ms", "MOCK_GW_01", INF_STATUS.SUCCESS, null, null));
+        interfaceStatusDetails.add(new InterfaceStatusDetail("IF-MOCK-002", "Mock 고객 인증", "2024-05-28 10:05:00", "50ms", "MOCK_AUTH_01", INF_STATUS.FAIL, "E401", "Mock 인증 토큰 만료"));
+        interfaceStatusDetails.add(new InterfaceStatusDetail("IF-MOCK-003", "Mock 배송 상태", "2024-05-28 11:00:00", "N/A", "MOCK_SHIP_01", INF_STATUS.IN_PROGRESS, null, null));
 
         // Schedule Entries Mock Data
         scheduleEntries.add(new ScheduleEntry("SCH-MOCK-001", "Mock 일일 판매 집계", "성공", "2024-05-28 02:00:00", "1분"));
@@ -52,7 +52,7 @@ public class MockDataProvider implements DataProvider {
     }
 
     @Override
-    public List<InterfaceStatusDetail> getInterfaceStatusDetails(String status) {
+    public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
         return interfaceStatusDetails.stream()
                 .filter(detail -> detail.getStatus().equals(status))
                 .collect(Collectors.toList());

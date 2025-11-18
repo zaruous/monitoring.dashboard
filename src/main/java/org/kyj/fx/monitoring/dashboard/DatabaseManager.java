@@ -65,11 +65,11 @@ public class DatabaseManager {
      * @param status 조회할 상태 ('성공', '실패', '진행중')
      * @return 해당 상태의 InterfaceStatusDetail 리스트
      */
-    public List<InterfaceStatusDetail> getInterfaceStatusDetails(String status) {
+    public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
         if (dataProvider == null) {
             throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
         }
-        return dataProvider.getInterfaceStatusDetails(status);
+        return dataProvider.getInterfaceStatusDetails(date, status);
     }
 
     /**

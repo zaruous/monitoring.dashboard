@@ -12,7 +12,7 @@ public interface DataProvider {
 
     void initializeDatabase();
 
-    List<InterfaceStatusDetail> getInterfaceStatusDetails(String status);
+    List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status);
 
     List<ScheduleEntry> getScheduleEntries(LocalDate date);
 

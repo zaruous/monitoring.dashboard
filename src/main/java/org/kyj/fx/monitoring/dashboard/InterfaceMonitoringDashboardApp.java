@@ -1,5 +1,10 @@
 package org.kyj.fx.monitoring.dashboard;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.kyj.fx.monitoring.dashboard.plugin.MonitoringPlugin;
 import org.kyj.fx.monitoring.dashboard.plugin.PluginManager;
 
@@ -19,19 +24,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class InterfaceMonitoringDashboardApp extends Application {
     // 각 컨트롤에 대한 참조를 저장할 필드
@@ -43,7 +42,9 @@ public class InterfaceMonitoringDashboardApp extends Application {
     private Scene rootScene;
 	@Override
 	public void start(Stage primaryStage) {
+		
         DatabaseManager dbManager = DatabaseManager.getInstance();
+        dbManager.setDataProvider(new AkcDataProvider());
         dbManager.initializeDatabase();
 
         primaryStage.setTitle("인터페이스 모니터링 보드 (JavaFX)");

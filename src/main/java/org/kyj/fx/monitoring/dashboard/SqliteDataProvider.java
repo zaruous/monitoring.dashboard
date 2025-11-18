@@ -118,12 +118,12 @@ public class SqliteDataProvider implements DataProvider {
     }
 
     @Override
-    public List<InterfaceStatusDetail> getInterfaceStatusDetails(String status) {
+    public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
         String sql = "SELECT * FROM interface_status WHERE status = ?";
         List<InterfaceStatusDetail> details = new ArrayList<>();
         try (Connection conn = this.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, status);
+            pstmt.setString(1, status.getName());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 details.add(new InterfaceStatusDetail(
@@ -132,7 +132,7 @@ public class SqliteDataProvider implements DataProvider {
                         rs.getString("timestamp"),
                         rs.getString("duration"),
                         rs.getString("server"),
-                        rs.getString("status"),
+                        INF_STATUS.valueOf(rs.getString("result_status")),
                         rs.getString("error_code"),
                         rs.getString("error_message")));
             }
