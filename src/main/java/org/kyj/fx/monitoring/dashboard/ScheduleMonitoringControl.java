@@ -2,9 +2,15 @@ package org.kyj.fx.monitoring.dashboard;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -55,22 +61,30 @@ public class ScheduleMonitoringControl extends CardControl {
 		scheduleTableView.getColumns().addAll(idCol, nameCol, statusCol, timeCol);
 		VBox.setVgrow(scheduleTableView, Priority.ALWAYS);
 
-        reloadData(); // 초기 데이터 로드
-
-        this.getChildren().addAll(datePickerBox, scheduleTableView);
+		this.getChildren().addAll(datePickerBox, scheduleTableView);
         VBox.setVgrow(this, Priority.ALWAYS);
         HBox.setHgrow(this, Priority.ALWAYS);
+        
+        reloadData(); // 초기 데이터 로드
+
+        
 	}
 
 	public void reloadData() {
         LocalDate selectedDate = scheduleDatePicker.getValue();
         if (selectedDate == null) return;
-
-        List<ScheduleEntry> entries = dbManager.getScheduleEntries(selectedDate);
-        scheduleTableView.setItems(FXCollections.observableArrayList(entries));
-        if (entries.isEmpty()) {
-            scheduleTableView.setPlaceholder(new Label("해당 날짜의 스케줄 정보가 없습니다."));
-        }
+    	
+        ThreadPoll.getInstance().execute(()->{
+        	List<ScheduleEntry> entries = dbManager.getScheduleEntries(selectedDate);
+        	Platform.runLater(()->{
+        		 scheduleTableView.setItems(FXCollections.observableArrayList(entries));
+    	        if (entries.isEmpty()) {
+    	            scheduleTableView.setPlaceholder(new Label("해당 날짜의 스케줄 정보가 없습니다."));
+    	        }
+			});
+        });
+        
+       
     }
 	
 	public List<ScheduleEntry> getScheduleData() {

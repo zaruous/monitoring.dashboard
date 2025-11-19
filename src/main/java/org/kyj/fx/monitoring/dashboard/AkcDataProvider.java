@@ -90,7 +90,8 @@ public class AkcDataProvider implements DataProvider {
 		sb.append("		where 1=1 \n");
 		sb.append("	            	AND IF_DATE >= ?\n");
 		sb.append("	            	AND IF_DATE <= ?\n");
-		sb.append("	            	AND if_process_status = ? \n");
+		if(status !=null)
+			sb.append("	            	AND if_process_status = ? \n");
 		sb.append("		order by if_id\n");
 		
 		String fromDate = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -205,15 +206,18 @@ public class AkcDataProvider implements DataProvider {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT\n");
-		sb.append("m.ERROR_CODE , m.ERROR_MSG, m.ERROR_DESC, COUNT(1) AS COUNT\n");
+		sb.append("m.ERROR_ID, m.ERROR_CODE , m.ERROR_MSG, m.ERROR_DESC, START_TIME AS REG_DATE \n");
 		sb.append("FROM\n");
 		sb.append("	MADMERRLOG(nolock) m \n");
 		sb.append("WHERE\n");
 		sb.append("	1 = 1\n");
 		sb.append("AND m.TRAN_TIME >= CONVERT (DATETIME,  ? + ' 00:00:00')\n");
 		sb.append("AND m.TRAN_TIME < CONVERT (DATETIME,  ? + ' 23:59:59')\n");
-		sb.append("\n");
-		sb.append("GROUP BY m.ERROR_CODE , m.ERROR_MSG , m.ERROR_DESC\n");
+		
+		sb.append("AND m.ERROR_CODE NOT IN ('AUTH_ERROR') \n");
+		
+		sb.append("ORDER BY m.START_TIME DESC");
+//		sb.append("GROUP BY m.ERROR_CODE , m.ERROR_MSG , m.ERROR_DESC\n");
 		
 		String fromDate = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 		String toDate = date.plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -226,11 +230,13 @@ public class AkcDataProvider implements DataProvider {
 	            ResultSet rs = pstmt.executeQuery();
 	            while (rs.next()) {
 	                details.add(new ServiceErrorEntry(
+	                		rs.getString("ERROR_ID"),
 	                        rs.getString("ERROR_CODE"),
 	                        rs.getString("ERROR_MSG"),
 	                        rs.getString("ERROR_DESC"),
-	                        rs.getInt("COUNT"),
-	                        ""
+	                        1,
+	                        rs.getString("ERROR_DESC"),
+	                        rs.getTime("REG_DATE").toLocalTime()
 	                        ));
 	            }
 	        } catch (SQLException e) {
@@ -238,6 +244,33 @@ public class AkcDataProvider implements DataProvider {
 	        }
 		
 		return details;
+	}
+	
+	public ServiceErrorLog getServiceErrorLog(String errorId) {
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT \n");
+		sb.append("m.ERROR_LOG, m.INPUT_PARAMS \r\n");
+		sb.append("FROM\n");
+		sb.append("	MADMERRLOG(nolock) m \n");
+		sb.append("WHERE\n");
+		sb.append("m.ERROR_ID = ?\n");
+		
+	
+		ServiceErrorLog errorLog = new ServiceErrorLog();
+		try (Connection conn = this.connect();
+	             PreparedStatement pstmt = conn.prepareStatement(sb.toString())) {
+	            pstmt.setString(1, errorId);
+	            ResultSet rs = pstmt.executeQuery();
+	            if (rs.next()) {
+	            	errorLog.setErrorLog(rs.getString("INPUT_PARAMS") + "\n\n" +  rs.getString("ERROR_LOG"));
+	            	errorLog.setErrorId(errorId);
+            	}
+	        } catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	        }
+		
+		return errorLog;
 	}
 
 }

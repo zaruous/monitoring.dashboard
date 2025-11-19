@@ -51,9 +51,12 @@ public class OverallStatusControl extends CardControl {
 		totalCountsLabel.setPadding(new Insets(5, 0, 0, 0));
 
 		datePicker = new DatePicker(LocalDate.now());
+		datePicker.setOnAction(ev -> reloadData());
 		this.getChildren().addAll(new HBox(new Label("날짜 선택 : "), datePicker), pieChart, totalCountsLabel);
 		VBox.setVgrow(this, Priority.ALWAYS);
 		HBox.setHgrow(this, Priority.ALWAYS);
+		
+		
 	}
 
 	/**

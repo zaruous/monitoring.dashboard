@@ -84,4 +84,9 @@ public class MockDataProvider implements DataProvider {
 	public List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date) {
 		return new ArrayList<>();
 	}
+	
+	@Override
+	public ServiceErrorLog getServiceErrorLog(String errorId) {
+		return new ServiceErrorLog(errorId, "Not Implemented");
+	}
 }

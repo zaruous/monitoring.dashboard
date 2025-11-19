@@ -129,4 +129,16 @@ public class DatabaseManager {
         }
         return dataProvider.getServiceErrorEntries(date);
 	}
+	
+	/**
+	 * @param errorId
+	 * @return
+	 */
+	public ServiceErrorLog getServiceErrorLog(String errorId) {
+		if (dataProvider == null) {
+            throw new IllegalStateException("DataProvider가 설정되지 않았습니다.");
+        }
+        return dataProvider.getServiceErrorLog(errorId);
+	}
+	
 }

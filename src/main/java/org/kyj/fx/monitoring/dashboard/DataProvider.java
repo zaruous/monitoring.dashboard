@@ -22,5 +22,8 @@ public interface DataProvider {
 
     boolean addInterfaceStatus(InterfaceStatusDetail statusDetail);
 
+    
+    // Service Error Log 관련 메서드
 	List<ServiceErrorEntry> getServiceErrorEntries(LocalDate date);
+	ServiceErrorLog getServiceErrorLog(String errorId);
 }

@@ -242,6 +242,62 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	}
     
 	public static void main(String[] args) {
-		launch(args);
+		if (args.length > 0 && "batch".equalsIgnoreCase(args[0])) {
+			runBatchMode();
+		} else {
+			launch(args);
+		}
+	}
+
+	private static void runBatchMode() {
+		System.out.println("Running in batch mode...");
+		DatabaseManager dbManager = DatabaseManager.getInstance();
+		dbManager.setDataProvider(new AkcDataProvider());
+		dbManager.initializeDatabase();
+
+		List<ServiceErrorEntry> serviceErrors = dbManager.getServiceErrorEntries(LocalDate.now());
+
+		if (serviceErrors != null && !serviceErrors.isEmpty()) {
+			System.out.println("Found " + serviceErrors.size() + " service errors. Generating notification.");
+			generateAndSaveErrorHtmlReport(serviceErrors);
+		} else {
+			System.out.println("No service errors found.");
+		}
+	}
+
+	private static void generateAndSaveErrorHtmlReport(List<ServiceErrorEntry> errors) {
+		StringBuilder html = new StringBuilder();
+		html.append("<html><head><title>서비스 에러 내역</title>");
+		html.append("<style>");
+		html.append("body { font-family: sans-serif; }");
+		html.append("table { border-collapse: collapse; width: 100%; }");
+		html.append("th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }");
+		html.append("th { background-color: #f2f2f2; }");
+		html.append("</style>");
+		html.append("</head><body>");
+		html.append("<h2>서비스 에러 내역 - ").append(LocalDate.now()).append("</h2>");
+		html.append("<table>");
+		html.append("<tr><th>에러 코드</th><th>에러 메시지</th><th>에러 설명</th><th>횟수</th></tr>");
+
+		for (ServiceErrorEntry error : errors) {
+			html.append("<tr>");
+			html.append("<td>").append(error.getErrorCode()).append("</td>");
+			html.append("<td>").append(error.getErrorMsg()).append("</td>");
+			html.append("<td>").append(error.getErrorDesc()).append("</td>");
+			html.append("<td>").append(error.getCount()).append("</td>");
+			html.append("</tr>");
+		}
+
+		html.append("</table>");
+		html.append("</body></html>");
+
+		String fileName = String.format("%s_서비스에러 내역.html", LocalDate.now());
+		try (java.io.PrintWriter writer = new java.io.PrintWriter(fileName, "UTF-8")) {
+			writer.println(html.toString());
+			System.out.println("Successfully generated error report: " + fileName);
+		} catch (java.io.IOException e) {
+			System.err.println("Failed to generate error report.");
+			e.printStackTrace();
+		}
 	}
 }

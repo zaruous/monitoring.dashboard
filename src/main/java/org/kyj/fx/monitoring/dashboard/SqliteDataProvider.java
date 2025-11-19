@@ -238,12 +238,17 @@ public class SqliteDataProvider implements DataProvider {
 			pstmt.setString(1, datePattern);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				entries.add(new ServiceErrorEntry(rs.getString("error_code"), rs.getString("error_message"), "",
-						rs.getInt("count"), rs.getString("timestamps")));
+				entries.add(new ServiceErrorEntry(rs.getString("error_code"), rs.getString("error_code"), rs.getString("error_message"), "",
+						rs.getInt("count"), "", rs.getTime("timestamps").toLocalTime()));
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		}
 		return entries;
+	}
+
+	@Override
+	public ServiceErrorLog getServiceErrorLog(String errorId) {
+		return new ServiceErrorLog(errorId, "Not Implemented");
 	}
 }
