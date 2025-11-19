@@ -1,0 +1,235 @@
+/* Sky-Cute and Playful Theme for Monitoring Dashboard */
+
+:root {
+    --cute-primary: #87ceeb; /* Sky Blue (was Playful Pink) */
+    --cute-secondary: #a9d2ff; /* Lighter Sky Blue */
+    --cute-accent: #ffea85; /* Sunny Yellow */
+    
+    --background-color-cute: #f0f8ff; /* Alice Blue (was Very light pink) */
+    --card-background-color-cute: #ffffff; /* White cards */
+    --text-color-cute: #4a4a4a; /* Dark Gray (was Soft Gray) */
+    --heading-color-cute: #367588; /* Deeper Blue (was Stronger Pink) */
+    --border-color-cute: #d4e6f1; /* Light Blue Border (was Light pink border) */
+    
+    --status-success-cute: #82e0aa; /* Mint Green */
+    --status-warning-cute: #f7d794; /* Pastel Orange */
+    --status-danger-cute: #ff7f7f; /* Coral Pink (was Light Red) */
+}
+
+body {
+    background-color: var(--background-color-cute);
+    color: var(--text-color-cute);
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Changed from Comic Sans */
+    font-size: 16px;
+}
+
+.container-fluid {
+    padding: 2rem;
+}
+
+h1.h3 {
+    color: var(--heading-color-cute);
+    font-weight: bold;
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 2.5rem !important;
+    text-shadow: 2px 2px 3px rgba(54, 117, 136, 0.1);
+}
+
+.card {
+    background-color: var(--card-background-color-cute);
+    border: 2px solid var(--border-color-cute);
+    border-radius: 20px; /* Very rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    background-color: transparent;
+    color: var(--heading-color-cute);
+    font-weight: bold;
+    border-bottom: 2px dashed var(--border-color-cute);
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-size: 1.2rem;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Overall Status Cards Specifics */
+#overall-status-cards .card {
+    border-top: 10px solid;
+    border-top-color: var(--cute-secondary);
+}
+
+#overall-status-cards .card.status-success {
+    border-top-color: var(--status-success-cute);
+}
+
+#overall-status-cards .card.status-warning {
+    border-top-color: var(--status-warning-cute);
+}
+
+#overall-status-cards .card.status-danger {
+    border-top-color: var(--status-danger-cute);
+}
+
+/* Tables */
+.table {
+    --bs-table-bg: white;
+    --bs-table-striped-bg: #f7fafd; /* Was #fff0f3 */
+    --bs-table-striped-color: var(--text-color-cute);
+    --bs-table-hover-bg: #eaf5ff; /* Was #ffe3e9 */
+    --bs-table-hover-color: var(--heading-color-cute);
+    color: var(--text-color-cute);
+    border-color: var(--border-color-cute);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: var(--cute-secondary);
+    color: var(--heading-color-cute);
+    font-weight: bold;
+    border-bottom: none;
+    text-align: center;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--bs-table-striped-bg);
+}
+
+/* DataTables */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--text-color-cute);
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    background-color: white;
+    color: var(--text-color-cute);
+    border: 2px solid var(--border-color-cute);
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+.page-item .page-link {
+    background-color: transparent;
+    color: var(--cute-primary);
+    border: 2px solid var(--cute-primary);
+    border-radius: 50%; /* circular buttons */
+    margin: 0 5px;
+}
+
+.page-item .page-link:hover {
+    background-color: var(--cute-primary);
+    color: white;
+}
+
+.page-item.active .page-link {
+    background-color: var(--cute-primary);
+    border-color: var(--cute-primary);
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    background-color: #e3f2fd;
+    border-color: #e3f2fd;
+    color: #a9d2ff;
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--background-color-cute);
+    border: 3px solid var(--cute-secondary);
+    border-radius: 20px;
+}
+
+.modal-header {
+    border-bottom: 2px dashed var(--cute-secondary);
+    color: var(--heading-color-cute);
+    font-weight: bold;
+}
+
+.modal-footer {
+    border-top: 2px dashed var(--cute-secondary);
+}
+
+.btn-close {
+    opacity: 1;
+    font-size: 1.5rem;
+}
+
+.btn-secondary {
+    background-color: var(--cute-secondary);
+    border-color: var(--cute-secondary);
+    color: white;
+    border-radius: 20px;
+    font-weight: bold;
+    padding: 10px 20px;
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+}
+
+pre {
+    background-color: #eaf5ff;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px solid #d4e6f1;
+    color: #367588;
+}
+
+/* --- CSS Override Rules --- */
+/* Force cute theme background and text color over Bootstrap utilities */
+body.bg-dark {
+    background-color: var(--background-color-cute) !important;
+}
+
+/* Override text-light for the whole body, but allow card headers to have their own cute color */
+body.text-light {
+    color: var(--text-color-cute) !important;
+}
+
+/* Force cute theme card background and text color */
+.card.bg-dark-2, 
+.card {
+    background-color: var(--card-background-color-cute) !important;
+}
+
+/* Ensure all text elements within a card use the cute theme's text color */
+.card .card-body *,
+.card .card-body {
+    color: var(--text-color-cute) !important;
+}
+
+/* Make sure card headers have the correct cute color */
+.card-header {
+    color: var(--heading-color-cute) !important;
+}
+
+/* Fix for table text color */
+.table, .table td, .table th,
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    color: var(--text-color-cute) !important;
+}
+.table thead th {
+    background-color: var(--cute-secondary) !important; /* Override with cute-secondary */
+    color: var(--heading-color-cute) !important;
+}

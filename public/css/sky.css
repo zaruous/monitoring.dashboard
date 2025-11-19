@@ -1,0 +1,196 @@
+/* Sky Theme for Monitoring Dashboard */
+
+:root {
+    --sky-primary: #5c97bf; /* A calm, medium blue */
+    --sky-secondary: #87ceeb; /* Sky blue */
+    --sky-accent: #f0f8ff; /* Alice blue, for backgrounds */
+    
+    --background-color-sky: #f0f8ff; /* Alice blue, almost white */
+    --card-background-color-sky: #ffffff; /* Clean white cards */
+    --text-color-sky: #4a4a4a; /* Dark gray for contrast */
+    --heading-color-sky: #367588; /* A deeper, muted blue */
+    --border-color-sky: #d4e6f1; /* Light, soft blue border */
+    
+    --status-success-sky: #90ee90; /* Light Green */
+    --status-warning-sky: #ffd700; /* Gold */
+    --status-danger-sky: #ff7f7f; /* Coral Pink */
+}
+
+body {
+    background-color: var(--background-color-sky);
+    color: var(--text-color-sky);
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container-fluid {
+    padding: 2rem;
+}
+
+h1.h3 {
+    color: var(--heading-color-sky);
+    font-weight: 300;
+    font-size: 2rem;
+    text-align: left;
+    margin-bottom: 2rem !important;
+    border-bottom: 1px solid var(--border-color-sky);
+    padding-bottom: 1rem;
+}
+
+.card {
+    background-color: var(--card-background-color-sky);
+    border: 1px solid var(--border-color-sky);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: #e3f2fd; /* Thematic light blue */
+    color: var(--heading-color-sky);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color-sky);
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Overall Status Cards Specifics */
+#overall-status-cards .card {
+    border-left: 5px solid var(--sky-secondary);
+}
+
+#overall-status-cards .card.status-success {
+    border-left-color: var(--status-success-sky);
+}
+
+#overall-status-cards .card.status-warning {
+    border-left-color: var(--status-warning-sky);
+}
+
+#overall-status-cards .card.status-danger {
+    border-left-color: var(--status-danger-sky);
+}
+
+/* Tables */
+.table {
+    --bs-table-bg: white;
+    --bs-table-striped-bg: #f7fafd;
+    --bs-table-striped-color: var(--text-color-sky);
+    --bs-table-hover-bg: #eaf5ff;
+    --bs-table-hover-color: var(--heading-color-sky);
+    color: var(--text-color-sky);
+    border-color: var(--border-color-sky);
+}
+
+.table thead th {
+    background-color: var(--sky-primary);
+    color: white;
+    font-weight: 600;
+    border-bottom: 2px solid var(--sky-primary);
+}
+
+/* DataTables */
+.dataTables_wrapper .dataTables_filter input {
+    background-color: white;
+    color: var(--text-color-sky);
+    border: 1px solid var(--border-color-sky);
+    border-radius: 4px;
+}
+
+.page-item .page-link {
+    color: var(--sky-primary);
+    border-color: var(--border-color-sky);
+}
+
+.page-item .page-link:hover {
+    background-color: #eaf5ff;
+}
+
+.page-item.active .page-link {
+    background-color: var(--sky-primary);
+    border-color: var(--sky-primary);
+    color: white;
+}
+
+.page-item.disabled .page-link {
+    color: #b0c4de;
+    border-color: var(--border-color-sky);
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--background-color-sky);
+    border: 1px solid var(--border-color-sky);
+    border-radius: 8px;
+}
+
+.modal-header {
+    border-bottom-color: var(--border-color-sky);
+    color: var(--heading-color-sky);
+}
+
+.modal-footer {
+    border-top-color: var(--border-color-sky);
+}
+
+.btn-secondary {
+    background-color: var(--sky-secondary);
+    border-color: var(--sky-secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    filter: brightness(110%);
+}
+
+pre {
+    background-color: #eaf5ff;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color-sky);
+    color: #333;
+}
+
+/* --- CSS Override Rules --- */
+body.bg-dark {
+    background-color: var(--background-color-sky) !important;
+}
+
+body.text-light {
+    color: var(--text-color-sky) !important;
+}
+
+.card.bg-dark-2, 
+.card {
+    background-color: var(--card-background-color-sky) !important;
+}
+
+.card .card-body *,
+.card .card-body {
+    color: var(--text-color-sky) !important;
+}
+
+.card-header {
+    color: var(--heading-color-sky) !important;
+    background-color: #e3f2fd !important; /* Override for consistency */
+}
+
+.table, .table td, .table th,
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+    color: var(--text-color-sky) !important;
+}
+
+.table thead th {
+    color: white !important;
+    background-color: var(--sky-primary) !important;
+}
