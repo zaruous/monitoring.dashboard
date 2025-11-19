@@ -242,8 +242,15 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	}
     
 	public static void main(String[] args) {
-		if (args.length > 0 && "batch".equalsIgnoreCase(args[0])) {
-			runBatchMode();
+		if (args.length > 0) {
+			String mode = args[0];
+			if ("batch".equalsIgnoreCase(mode)) {
+				runBatchMode();
+			} else if ("web".equalsIgnoreCase(mode)) {
+				org.kyj.fx.monitoring.dashboard.web.WebApp.main(args);
+			} else {
+				launch(args);
+			}
 		} else {
 			launch(args);
 		}

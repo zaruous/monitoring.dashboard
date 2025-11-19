@@ -38,7 +38,7 @@
 - **Web Server**: Javalin
 - **Database**: SQLite (기본), MSSQL 지원
 - **Build**: Apache Maven
-- **Runtime**: Java 21 (JLink를 통해 Custom Runtime Image 생성)
+- **Runtime**: Java 21 (실행 가능한 단일 Jar 파일로 패키징)
 
 ## 4. 실행 방법
 
@@ -51,28 +51,29 @@
 ```bash
 mvn clean package
 ```
-빌드가 성공하면 `target` 디렉토리에 실행 가능한 `jlink-image`와 `modules`가 생성됩니다.
+빌드가 성공하면 `target` 디렉토리에 실행 가능한 `monitoring.dashboard-0.0.1-SNAPSHOT.jar` 파일이 생성됩니다.
 
 ### 실행
 
+애플리케이션은 `java -jar` 명령어를 통해 실행하며, 실행 인자에 따라 모드가 변경됩니다.
+
 #### 1. JavaFX 애플리케이션 실행
-`target` 디렉토리에 생성된 `runme.bat` 파일을 실행합니다.
+GUI 데스크톱 애플리케이션을 실행합니다.
 ```bash
-# target/runme.bat 내부 명령어
-start jlink-image\bin\org.kyj.fx.bat
+java -jar target/monitoring.dashboard-0.0.1-SNAPSHOT.jar
 ```
 
-#### 2. 웹 애플리케이션 실행
-다음 명령어를 통해 내장 웹 서버를 실행할 수 있습니다.
+#### 2. 웹 대시보드 실행
+내장 웹 서버를 실행합니다. (기본 포트: `10024`)
 ```bash
-java -p target/modules -m monitoring.dashboard/org.kyj.fx.monitoring.dashboard.web.WebApp
+java -jar target/monitoring.dashboard-0.0.1-SNAPSHOT.jar web
 ```
 서버가 실행되면 웹 브라우저에서 `http://localhost:10024` 로 접속하여 확인할 수 있습니다.
 
 #### 3. 배치 모드 실행
-서비스 에러를 확인하고 HTML 리포트를 생성하려면 다음 명령어를 사용합니다.
+서비스 에러를 확인하고 HTML 리포트를 생성합니다.
 ```bash
-java -p target/modules -m monitoring.dashboard/org.kyj.fx.monitoring.dashboard.InterfaceMonitoringDashboardApp batch
+java -jar target/monitoring.dashboard-0.0.1-SNAPSHOT.jar batch
 ```
 
 ## 5. 설정
