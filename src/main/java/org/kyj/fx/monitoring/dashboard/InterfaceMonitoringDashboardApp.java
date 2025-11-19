@@ -41,6 +41,22 @@ public class InterfaceMonitoringDashboardApp extends Application {
     private ServiceErrorMonitoringControl serviceErrorMonitoringControl; // 변경
     private GridPane mainGridPane;
     private Scene rootScene;
+    
+    public static void main(String[] args) {
+		if (args.length > 0) {
+			String mode = args[0];
+			if ("batch".equalsIgnoreCase(mode)) {
+				runBatchMode();
+			} else if ("web".equalsIgnoreCase(mode)) {
+				org.kyj.fx.monitoring.dashboard.web.WebApp.main(args);
+			} else {
+				launch(args);
+			}
+		} else {
+			launch(args);
+		}
+	}
+    
 	@Override
 	public void start(Stage primaryStage) {
 		
@@ -241,20 +257,7 @@ public class InterfaceMonitoringDashboardApp extends Application {
 		return overallStatusControl.getSelectedDate();
 	}
     
-	public static void main(String[] args) {
-		if (args.length > 0) {
-			String mode = args[0];
-			if ("batch".equalsIgnoreCase(mode)) {
-				runBatchMode();
-			} else if ("web".equalsIgnoreCase(mode)) {
-				org.kyj.fx.monitoring.dashboard.web.WebApp.main(args);
-			} else {
-				launch(args);
-			}
-		} else {
-			launch(args);
-		}
-	}
+	
 
 	private static void runBatchMode() {
 		System.out.println("Running in batch mode...");

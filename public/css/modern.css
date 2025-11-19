@@ -1,0 +1,169 @@
+/* Modern Dark Theme for Monitoring Dashboard */
+
+:root {
+    --primary-color: #00a8ff;
+    --secondary-color: #00c78a;
+    --background-color: #1a1a2e;
+    --card-background-color: #1f1f3a;
+    --text-color: #e0e0e0;
+    --header-color: #ffffff;
+    --border-color: #2a2a4a;
+    --table-header-bg: #2a2a4a;
+    --table-row-hover-bg: #2f2f4f;
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container-fluid {
+    padding: 2rem;
+}
+
+h1.h3 {
+    color: var(--header-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 2rem !important;
+}
+
+.card {
+    background-color: var(--card-background-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    background-color: var(--card-background-color);
+    color: var(--header-color);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    padding: 1rem 1.5rem;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Overall Status Cards Specifics */
+#overall-status-cards .card {
+    border-left: 5px solid var(--secondary-color);
+}
+
+#overall-status-cards .card.status-success {
+    border-left-color: #28a745;
+}
+
+#overall-status-cards .card.status-warning {
+    border-left-color: #ffc107;
+}
+
+#overall-status-cards .card.status-danger {
+    border-left-color: #dc3545;
+}
+
+/* Tables */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: #2a2a4a;
+    --bs-table-striped-color: var(--text-color);
+    --bs-table-hover-bg: var(--table-row-hover-bg);
+    --bs-table-hover-color: var(--header-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.table thead th {
+    background-color: var(--table-header-bg);
+    color: var(--header-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* DataTables */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--text-color);
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--card-background-color);
+    color: #6c757d;
+    border-color: var(--border-color);
+}
+
+.page-item .page-link {
+    background-color: var(--card-background-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.page-item.active .page-link {
+    z-index: 3;
+    color: #fff;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--card-background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-close-white {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.btn-secondary {
+    background-color: #4a4a6a;
+    border-color: #4a4a6a;
+}
+
+.btn-secondary:hover {
+    background-color: #5a5a7a;
+    border-color: #5a5a7a;
+}
+
+pre {
+    background-color: var(--background-color);
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
