@@ -1,0 +1,235 @@
+/* Expert Dark Theme for Monitoring Dashboard */
+
+:root {
+    --primary-accent-color: #007bff; /* A professional blue for accents */
+    --secondary-accent-color: #28a745; /* Green for success */
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    
+    --background-color-expert: #212529; /* Darker charcoal */
+    --card-background-color-expert: #2c3034; /* Slightly lighter for cards */
+    --text-color-expert: #e9ecef; /* Off-white for readability */
+    --heading-color-expert: #f8f9fa; /* Pure white for main headings */
+    --border-color-expert: #495057; /* Subtle grey for borders */
+    --table-header-bg-expert: #343a40; /* Darker grey for table headers */
+    --table-row-hover-bg-expert: #3a3f44; /* Slightly lighter for row hover */
+    --shadow-expert: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+body {
+    background-color: var(--background-color-expert);
+    color: var(--text-color-expert);
+    font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+.container-fluid {
+    padding: 2.5rem 3rem;
+}
+
+h1.h3 {
+    color: var(--heading-color-expert);
+    font-weight: 500;
+    font-size: 1.75rem;
+    margin-bottom: 2.5rem !important;
+    position: relative;
+    padding-bottom: 0.75rem;
+}
+
+h1.h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 60px;
+    height: 3px;
+    background-color: var(--primary-accent-color);
+    border-radius: 2px;
+}
+
+.card {
+    background-color: var(--card-background-color-expert);
+    border: 1px solid var(--border-color-expert);
+    border-radius: .375rem; /* Bootstrap's default border-radius */
+    box-shadow: var(--shadow-expert);
+    transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .25rem .5rem rgba(0,0,0,.15);
+}
+
+.card-header {
+    background-color: var(--table-header-bg-expert);
+    color: var(--heading-color-expert);
+    font-weight: 500;
+    border-bottom: 1px solid var(--border-color-expert);
+    padding: 1rem 1.5rem;
+    border-top-left-radius: calc(.375rem - 1px);
+    border-top-right-radius: calc(.375rem - 1px);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Overall Status Cards Specifics */
+#overall-status-cards .card {
+    border-left: 4px solid transparent; /* Base for status colors */
+}
+
+#overall-status-cards .card-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#overall-status-cards .card-title {
+    font-size: 1.1rem;
+    color: var(--text-color-expert);
+}
+
+#overall-status-cards .card-text {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--heading-color-expert);
+}
+
+#overall-status-cards .card.status-success {
+    border-left-color: var(--secondary-accent-color);
+}
+
+#overall-status-cards .card.status-warning {
+    border-left-color: var(--warning-color);
+}
+
+#overall-status-cards .card.status-danger {
+    border-left-color: var(--danger-color);
+}
+
+/* Tables */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: var(--background-color-expert);
+    --bs-table-striped-color: var(--text-color-expert);
+    --bs-table-hover-bg: var(--table-row-hover-bg-expert);
+    --bs-table-hover-color: var(--heading-color-expert);
+    color: var(--text-color-expert);
+    border-color: var(--border-color-expert);
+}
+
+.table thead th {
+    background-color: var(--table-header-bg-expert);
+    color: var(--heading-color-expert);
+    font-weight: 500;
+    border-bottom: 1px solid var(--primary-accent-color);
+    padding: 0.75rem 1.5rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease-in-out;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+    background-color: var(--card-background-color-expert);
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: var(--table-row-hover-bg-expert);
+}
+
+/* DataTables */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    color: var(--text-color-expert);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    background-color: var(--background-color-expert);
+    color: var(--text-color-expert);
+    border: 1px solid var(--border-color-expert);
+    border-radius: .25rem;
+    padding: .375rem .75rem;
+}
+
+.page-item .page-link {
+    background-color: var(--card-background-color-expert);
+    color: var(--primary-accent-color);
+    border: 1px solid var(--border-color-expert);
+    transition: all 0.2s ease-in-out;
+}
+
+.page-item .page-link:hover {
+    background-color: var(--primary-accent-color);
+    color: var(--heading-color-expert);
+    border-color: var(--primary-accent-color);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary-accent-color);
+    border-color: var(--primary-accent-color);
+    color: var(--heading-color-expert);
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--card-background-color-expert);
+    color: #6c757d;
+    border-color: var(--border-color-expert);
+}
+
+/* Modal */
+.modal-content {
+    background-color: var(--card-background-color-expert);
+    color: var(--text-color-expert);
+    border: 1px solid var(--border-color-expert);
+    border-radius: .3rem;
+    box-shadow: var(--shadow-expert);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color-expert);
+    padding: 1rem 1.5rem;
+}
+
+.modal-title {
+    color: var(--heading-color-expert);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color-expert);
+    padding: 1rem 1.5rem;
+}
+
+.btn-close {
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23e9ecef'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat;
+    opacity: .75;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+pre {
+    background-color: #1a1d20;
+    padding: 1rem;
+    border-radius: .25rem;
+    border: 1px solid #495057;
+    color: #e9ecef;
+    overflow-x: auto;
+}

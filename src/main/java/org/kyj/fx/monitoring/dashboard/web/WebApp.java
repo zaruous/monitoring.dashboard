@@ -1,13 +1,19 @@
 package org.kyj.fx.monitoring.dashboard.web;
 
+import java.lang.reflect.Constructor;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.kyj.fx.monitoring.dashboard.AkcDataProvider;
 import org.kyj.fx.monitoring.dashboard.DataProvider;
 import org.kyj.fx.monitoring.dashboard.INF_STATUS;
+import org.kyj.fx.monitoring.dashboard.InterfaceMonitoringDashboardApp;
+import org.kyj.fx.monitoring.dashboard.MockDataProvider;
+import org.kyj.fx.monitoring.dashboard.PropertiesUtil;
 import org.kyj.fx.monitoring.dashboard.ServiceErrorEntry;
 import org.kyj.fx.monitoring.dashboard.ServiceErrorLog;
 
@@ -21,7 +27,19 @@ import io.javalin.http.staticfiles.Location;
 public class WebApp {
     public static void main(String[] args) {
         
-        DataProvider dataProvider = new AkcDataProvider();
+    	Properties orLoad = PropertiesUtil.createOrLoad(InterfaceMonitoringDashboardApp.class, ()->{
+			return PropertiesUtil.of(Map.of("provider.class.name", "org.kyj.fx.monitoring.dashboard.MockDataProvider"));
+		});
+		String clazz = orLoad.getProperty("provider.class.name", "org.kyj.fx.monitoring.dashboard.MockDataProvider");
+		DataProvider d = new MockDataProvider();
+		try {
+			Class<?> forName = Class.forName(clazz);
+			Constructor<?> constructor = forName.getConstructor();
+			d = (DataProvider) constructor.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		DataProvider dataProvider = d;
         ObjectMapper mapper = new ObjectMapper();
 
         Javalin app = Javalin.create(config -> {

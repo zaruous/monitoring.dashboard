@@ -1,9 +1,12 @@
 package org.kyj.fx.monitoring.dashboard;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 import org.kyj.fx.monitoring.dashboard.plugin.MonitoringPlugin;
@@ -60,8 +63,22 @@ public class InterfaceMonitoringDashboardApp extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		
+		
+		Properties orLoad = PropertiesUtil.createOrLoad(InterfaceMonitoringDashboardApp.class, ()->{
+			return PropertiesUtil.of(Map.of("provider.class.name", "org.kyj.fx.monitoring.dashboard.MockDataProvider"));
+		});
+		String clazz = orLoad.getProperty("provider.class.name", "org.kyj.fx.monitoring.dashboard.MockDataProvider");
+		DataProvider provider = new MockDataProvider();
+		try {
+			Class<?> forName = Class.forName(clazz);
+			Constructor<?> constructor = forName.getConstructor();
+			provider = (DataProvider) constructor.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
         DatabaseManager dbManager = DatabaseManager.getInstance();
-        dbManager.setDataProvider(new AkcDataProvider());
+        dbManager.setDataProvider(provider);
         dbManager.initializeDatabase();
 
         primaryStage.setTitle("인터페이스 모니터링 보드 (JavaFX)");
@@ -261,8 +278,22 @@ public class InterfaceMonitoringDashboardApp extends Application {
 
 	private static void runBatchMode() {
 		System.out.println("Running in batch mode...");
+		
+		Properties orLoad = PropertiesUtil.createOrLoad(InterfaceMonitoringDashboardApp.class, ()->{
+			return PropertiesUtil.of(Map.of("provider.class.name", "org.kyj.fx.monitoring.dashboard.MockDataProvider"));
+		});
+		String clazz = orLoad.getProperty("provider.class.name", "org.kyj.fx.monitoring.dashboard.MockDataProvider");
+		DataProvider provider = new MockDataProvider();
+		try {
+			Class<?> forName = Class.forName(clazz);
+			Constructor<?> constructor = forName.getConstructor();
+			provider = (DataProvider) constructor.newInstance();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		DatabaseManager dbManager = DatabaseManager.getInstance();
-		dbManager.setDataProvider(new AkcDataProvider());
+		dbManager.setDataProvider(provider);
 		dbManager.initializeDatabase();
 
 		List<ServiceErrorEntry> serviceErrors = dbManager.getServiceErrorEntries(LocalDate.now());
