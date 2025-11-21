@@ -82,15 +82,17 @@ $(document).ready(function () {
             "serverSide": false,
             "ajax": {
                 "url": "/api/errors",
-                "dataSrc": "data"
+                "dataSrc": "list"
             },
             "columns": [
                 { "data": "id" },
-                { "data": "service" },
+				{ "data": "errorCode" },
+				{ "data": "service" },
 				{ "data": "errorDesc" },
                 { "data": "message" },
-                { "data": "timestamp" }
+	            { "data": "regDate" }					
             ],
+			"order": [[ 5, "desc" ]], // 0번 컬럼(regDate)을 기준으로 내림차순 정렬
             "responsive": true,
             "lengthChange": false,
             "pageLength": 10,
@@ -108,7 +110,7 @@ $(document).ready(function () {
             if (!rowData) return;
 
             const errorId = rowData.id;
-            fetch(`/api/error-log/${errorId}`)
+            fetch(`/api/errors/${errorId}`)
                 .then(response => response.json())
                 .then(logData => {
                     $('#errorLogContent').text(logData.errorLog || 'No details available.');

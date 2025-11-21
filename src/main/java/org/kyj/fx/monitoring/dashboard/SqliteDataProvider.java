@@ -9,8 +9,10 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import org.kyj.fx.monitoring.dashboard.web.Parameter;
 
 /**
  * SQLite 데이터베이스에서 데이터를 제공하는 클래스.
@@ -119,27 +121,27 @@ public class SqliteDataProvider implements DataProvider {
     }
 
     @Override
-    public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
-        String sql = "SELECT * FROM interface_status WHERE status = ?";
+    public List<InterfaceStatusDetail> getInterfaceStatusDetails(Parameter pathParamMap) {
+//        String sql = "SELECT * FROM interface_status WHERE status = ?";
         List<InterfaceStatusDetail> details = new ArrayList<>();
-        try (Connection conn = this.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, status.getName());
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                details.add(new InterfaceStatusDetail(
-                        rs.getString("id"),
-                        rs.getString("name"),
-                        rs.getString("timestamp"),
-                        rs.getString("duration"),
-                        rs.getString("server"),
-                        INF_STATUS.valueOf(rs.getString("result_status")),
-                        rs.getString("error_code"),
-                        rs.getString("error_message")));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
+//        try (Connection conn = this.connect();
+//             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+//            pstmt.setString(1, status.getName());
+//            ResultSet rs = pstmt.executeQuery();
+//            while (rs.next()) {
+//                details.add(new InterfaceStatusDetail(
+//                        rs.getString("id"),
+//                        rs.getString("name"),
+//                        rs.getString("timestamp"),
+//                        rs.getString("duration"),
+//                        rs.getString("server"),
+//                        INF_STATUS.valueOf(rs.getString("result_status")),
+//                        rs.getString("error_code"),
+//                        rs.getString("error_message")));
+//            }
+//        } catch (SQLException e) {
+//            System.out.println(e.getMessage());
+//        }
         return details;
     }
 
@@ -238,8 +240,8 @@ public class SqliteDataProvider implements DataProvider {
 			pstmt.setString(1, datePattern);
 			ResultSet rs = pstmt.executeQuery();
 			while (rs.next()) {
-				entries.add(new ServiceErrorEntry(rs.getString("error_code"), rs.getString("error_code"), rs.getString("error_message"), "",
-						rs.getInt("count"), "", rs.getTime("timestamps").toLocalTime()));
+				entries.add(new ServiceErrorEntry(rs.getString("error_code"), rs.getString("error_code"), "", rs.getString("error_message"), "",
+						rs.getInt("count"), "", rs.getTimestamp("timestamps").toLocalDateTime()));
 			}
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
@@ -250,5 +252,15 @@ public class SqliteDataProvider implements DataProvider {
 	@Override
 	public ServiceErrorLog getServiceErrorLog(String errorId) {
 		return new ServiceErrorLog(errorId, "Not Implemented");
+	}
+
+	@Override
+	public InterfaceStatusSummary getInterfaceStatusSummary(LocalDate date) {
+		return new InterfaceStatusSummary();
+	}
+
+	@Override
+	public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
+		return Collections.emptyList();
 	}
 }

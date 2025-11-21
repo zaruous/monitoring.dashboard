@@ -1,8 +1,10 @@
 package org.kyj.fx.monitoring.dashboard;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.kyj.fx.monitoring.dashboard.fx.TableIndexCellValueFactory;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -41,22 +43,27 @@ public class ServiceErrorMonitoringControl extends CardControl {
 
 		tableView = new TableView<>();
 
+		TableColumn<ServiceErrorEntry, Integer> noCol = new TableColumn<>("No.");
+		noCol.setCellValueFactory(TableIndexCellValueFactory.forTableColumn());
+		noCol.setStyle("-fx-alignment: CENTER-RIGHT;");
+		
 		TableColumn<ServiceErrorEntry, String> errorCodeCol = new TableColumn<>("ERROR_CODE");
 		errorCodeCol.setCellValueFactory(v -> v.getValue().errorCodeProperty());
 
 		TableColumn<ServiceErrorEntry, String> errorDescCol = new TableColumn<>("ERROR_DESC");
 		errorDescCol.setCellValueFactory(v -> v.getValue().errorDescProperty());
-
+		errorDescCol.setPrefWidth(300);
 		TableColumn<ServiceErrorEntry, String> errorMsgCol = new TableColumn<>("ERROR_MSG");
 		errorMsgCol.setCellValueFactory(v -> v.getValue().errorMsgProperty());
 		
 		TableColumn<ServiceErrorEntry, Integer> countCol = new TableColumn<>("COUNT");
 		countCol.setCellValueFactory(v -> v.getValue().countProperty().asObject());
-
-		TableColumn<ServiceErrorEntry, LocalTime> regDateCol = new TableColumn<>("발생일");
+		countCol.setStyle("-fx-alignment: CENTER-RIGHT;");
+		
+		TableColumn<ServiceErrorEntry, LocalDateTime> regDateCol = new TableColumn<>("발생일");
 		regDateCol.setCellValueFactory(v -> v.getValue().regDateProperty());
 
-		tableView.getColumns().addAll(errorCodeCol, errorDescCol,errorMsgCol, countCol, regDateCol);
+		tableView.getColumns().addAll(noCol, errorCodeCol, errorDescCol,errorMsgCol, countCol, regDateCol);
 		VBox.setVgrow(tableView, Priority.ALWAYS);
 
 		reloadData(); // 초기 데이터 로드

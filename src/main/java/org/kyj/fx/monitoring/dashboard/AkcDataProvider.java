@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.kyj.fx.monitoring.dashboard.web.Parameter;
+
 /**
  * 
  */
@@ -82,15 +84,56 @@ public class AkcDataProvider implements DataProvider {
 	
 	
 	@Override
-	public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
+	public InterfaceStatusSummary getInterfaceStatusSummary(LocalDate date) {
 		
+		InterfaceStatusSummary summary = new InterfaceStatusSummary();
+		StringBuffer sb = new StringBuffer();
+		sb.append("SELECT \n");
+		sb.append("SUM(SUCCESS) AS SUCCESS,\n");
+		sb.append("SUM(FAIL) AS FAIL,\n");
+		sb.append("SUM(RETRAY) AS RETRAY,\n");
+		sb.append("SUM(IN_PROCESS) AS IN_PROCESS\n");
+		sb.append("FROM (\n");
+		sb.append("SELECT \n");
+		sb.append("  CASE WHEN IF_PROCESS_STATUS = 'S' THEN 1 ELSE 0  END SUCCESS,\n");
+		sb.append("  CASE WHEN IF_PROCESS_STATUS = 'E' THEN 1 ELSE 0  END FAIL,\n");
+		sb.append("  CASE WHEN IF_PROCESS_STATUS = 'R' THEN 1 ELSE 0  END RETRAY,\n");
+		sb.append("  CASE WHEN IF_PROCESS_STATUS = 'W' THEN 1 ELSE 0  END IN_PROCESS\n");
+		sb.append("	FROM IINFLOGDAT(NOLOCK)\n");
+		sb.append("	where if_date >= ? and if_date <= ? \n");
+		sb.append(") DD\n");
+		
+		
+		String fromDate = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		String toDate = date.plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		
+		try (Connection conn = this.connect();
+	             PreparedStatement pstmt = conn.prepareStatement(sb.toString())) {
+				pstmt.setString(1, fromDate);
+				pstmt.setString(2, toDate);
+	            ResultSet rs = pstmt.executeQuery();
+	            if (rs.next()) {
+	            	summary.setSuccess(rs.getInt("SUCCESS"));
+	            	summary.setFail(rs.getInt("FAIL"));
+	            	summary.setRetray(rs.getInt("RETRAY"));
+	            	summary.setInProgress(rs.getInt("IN_PROCESS"));
+	            }
+	        } catch (SQLException e) {
+	            System.out.println(e.getMessage());
+	        }
+		
+		return summary;
+	}
+	
+	@Override
+	public List<InterfaceStatusDetail> getInterfaceStatusDetails(LocalDate date, INF_STATUS status) {
 		String akcStatus = mapStatusToAkcCode(status);
 		StringBuffer sb = new StringBuffer();
-		sb.append("select EAI_KEY, IF_ID, if_process_status  from dbo.IINFLOGDAT (nolock)\n");
+		sb.append("select TOP 10000 EAI_KEY, IF_ID, IF_DATE, IF_TIME, if_process_status  from dbo.IINFLOGDAT (nolock)\n");
 		sb.append("		where 1=1 \n");
 		sb.append("	            	AND IF_DATE >= ?\n");
 		sb.append("	            	AND IF_DATE <= ?\n");
-		if(status !=null)
+		if(status != null)
 			sb.append("	            	AND if_process_status = ? \n");
 		sb.append("		order by if_id\n");
 		
@@ -108,12 +151,12 @@ public class AkcDataProvider implements DataProvider {
 	                details.add(new InterfaceStatusDetail(
 	                        rs.getString("EAI_KEY"),
 	                        rs.getString("IF_ID"),
-	                        null,
+	                        rs.getString("IF_DATE") + " " + rs.getString("IF_TIME"),
 	                        null,
 	                        "akc",
 	                        mapAkcCodeToStatus(rs.getString("if_process_status")),
-	                        "",
-	                        "")
+	                        null,
+	                        null)
 	                		);
 	            }
 	        } catch (SQLException e) {
@@ -122,7 +165,13 @@ public class AkcDataProvider implements DataProvider {
 		
 		return details;
 	}
-
+	
+	@Override
+	public List<InterfaceStatusDetail> getInterfaceStatusDetails(Parameter p) {
+		List<InterfaceStatusDetail> details = new ArrayList<>();
+		return details;
+	}
+	
 	@Override
 	public List<ScheduleEntry> getScheduleEntries(LocalDate date) {
 		StringBuffer sb = new StringBuffer();
@@ -206,37 +255,39 @@ public class AkcDataProvider implements DataProvider {
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("SELECT\n");
-		sb.append("m.ERROR_ID, m.ERROR_CODE , m.ERROR_MSG, m.ERROR_DESC, START_TIME AS REG_DATE \n");
+		sb.append("m.ERROR_ID, m.ERROR_CODE , m.SERVICE_NAME , m.ERROR_MSG, m.ERROR_DESC, m.TRAN_TIME AS REG_DATE \n");
 		sb.append("FROM\n");
 		sb.append("	MADMERRLOG(nolock) m \n");
 		sb.append("WHERE\n");
 		sb.append("	1 = 1\n");
-		sb.append("AND m.TRAN_TIME >= CONVERT (DATETIME,  ? + ' 00:00:00')\n");
-		sb.append("AND m.TRAN_TIME < CONVERT (DATETIME,  ? + ' 23:59:59')\n");
+		sb.append("AND m.TRAN_TIME >= ?\n");
+		sb.append("AND m.TRAN_TIME < ?\n");
 		
 		sb.append("AND m.ERROR_CODE NOT IN ('AUTH_ERROR') \n");
 		
-		sb.append("ORDER BY m.START_TIME DESC");
+		sb.append("ORDER BY m.TRAN_TIME DESC");
 //		sb.append("GROUP BY m.ERROR_CODE , m.ERROR_MSG , m.ERROR_DESC\n");
 		
-		String fromDate = date.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-		String toDate = date.plusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		java.sql.Date fromDate = java.sql.Date.valueOf(date);
+		java.sql.Date toDate = java.sql.Date.valueOf(date.plusDays(2));
 		
 		List<ServiceErrorEntry> details = new ArrayList<>();
 		try (Connection conn = this.connect();
 	             PreparedStatement pstmt = conn.prepareStatement(sb.toString())) {
-	            pstmt.setString(1, fromDate);
-	            pstmt.setString(2, toDate);
+				
+	            pstmt.setDate(1, fromDate);
+	            pstmt.setObject(2, toDate);
 	            ResultSet rs = pstmt.executeQuery();
 	            while (rs.next()) {
 	                details.add(new ServiceErrorEntry(
 	                		rs.getString("ERROR_ID"),
 	                        rs.getString("ERROR_CODE"),
+	                        rs.getString("SERVICE_NAME"),
 	                        rs.getString("ERROR_MSG"),
 	                        rs.getString("ERROR_DESC"),
 	                        1,
 	                        rs.getString("ERROR_DESC"),
-	                        rs.getTime("REG_DATE").toLocalTime()
+	                        rs.getTimestamp("REG_DATE").toLocalDateTime()
 	                        ));
 	            }
 	        } catch (SQLException e) {
@@ -272,5 +323,4 @@ public class AkcDataProvider implements DataProvider {
 		
 		return errorLog;
 	}
-
 }

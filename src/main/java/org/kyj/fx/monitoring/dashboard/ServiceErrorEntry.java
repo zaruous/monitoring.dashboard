@@ -1,6 +1,6 @@
 package org.kyj.fx.monitoring.dashboard;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import javafx.beans.property.IntegerProperty;
@@ -13,15 +13,17 @@ import javafx.beans.property.StringProperty;
 public class ServiceErrorEntry {
 	private StringProperty errorId = new SimpleStringProperty();
 	private StringProperty errorCode = new SimpleStringProperty();
+	private StringProperty serviceName = new SimpleStringProperty();
 	private StringProperty errorMsg = new SimpleStringProperty();
 	private StringProperty errorDesc = new SimpleStringProperty();
 	private IntegerProperty count = new SimpleIntegerProperty();
 	private StringProperty errorLog = new SimpleStringProperty();
-	private ObjectProperty<LocalTime> regDate = new SimpleObjectProperty();
+	private ObjectProperty<LocalDateTime> regDate = new SimpleObjectProperty();
 
-	public ServiceErrorEntry(String errorId, String errorCode, String errorMsg, String errorDesc, int count, String errorLog, LocalTime regDate) {
+	public ServiceErrorEntry(String errorId, String errorCode, String serviceName, String errorMsg, String errorDesc, int count, String errorLog, LocalDateTime regDate) {
 		this.errorId.set(errorId);
 		this.errorCode.set(errorCode);
+		this.serviceName.set(serviceName);
 		this.errorMsg.set(errorMsg);
 		this.errorDesc.set(errorDesc);
 		this.count.set(count);
@@ -89,15 +91,15 @@ public class ServiceErrorEntry {
 		this.errorLogProperty().set(errorLog);
 	}
 
-	public final ObjectProperty<LocalTime> regDateProperty() {
+	public final ObjectProperty<LocalDateTime> regDateProperty() {
 		return this.regDate;
 	}
 
-	public final LocalTime getRegDate() {
+	public final LocalDateTime getRegDate() {
 		return this.regDateProperty().get();
 	}
 
-	public final void setRegDate(final LocalTime regDate) {
+	public final void setRegDate(final LocalDateTime regDate) {
 		this.regDateProperty().set(regDate);
 	}
 
@@ -112,5 +114,22 @@ public class ServiceErrorEntry {
 	public final void setErrorId(final String errorId) {
 		this.errorIdProperty().set(errorId);
 	}
+
+	public final StringProperty serviceNameProperty() {
+		return this.serviceName;
+	}
+	
+
+	public final String getServiceName() {
+		return this.serviceNameProperty().get();
+	}
+	
+
+	public final void setServiceName(final String serviceName) {
+		this.serviceNameProperty().set(serviceName);
+	}
+	
+
+	
 
 }

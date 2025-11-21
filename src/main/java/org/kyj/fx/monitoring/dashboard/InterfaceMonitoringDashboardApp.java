@@ -2,7 +2,6 @@ package org.kyj.fx.monitoring.dashboard;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
